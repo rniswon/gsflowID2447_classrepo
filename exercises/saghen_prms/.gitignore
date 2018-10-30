@@ -1,0 +1,43 @@
+# Python specific
+*.pyc
+
+# Generic files to ignore
+*~
+*.lock
+*.bak
+log
+
+# PyCharm
+.idea
+
+# Model parameter files, folders, and shapefiles
+hru_params.*
+hru_params_*
+cascade_work/
+dem_rasters/
+fill_work/
+fishnet_temp/
+flow_rasters/
+hru_temp/
+impervious_rasters/
+logs/
+ppt_rasters/
+ppt_ratio_temp/
+ppt_ratio_temp/
+soil_rasters/
+stream_rasters/
+tmax_rasters/
+tmin_rasters/
+veg_rasters/
+!exercises/saghen_prms/examples/sagehen/hru_params/prms_dimensions.csv
+!exercises/saghen_prms/examples/sagehen/hru_params/prms_parameters.csv
+
+*.param
+
+# Project specific files and file types
+*.mxd
+*.img.aux.xml
+*.shp.xml
+*.cpg
+
+*.param

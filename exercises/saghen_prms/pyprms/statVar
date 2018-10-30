@@ -1,0 +1,44 @@
+basin_cfs, Streamflow out of watershed, cfs, one
+basin_et, Total evapotranspiration on watershed as sum for evaporation from snowpack; impervious areas, plant canopy; and soil zone and transpiration from soil zone; inches, one
+basin_gwflow_cfs, Area-weighted average ground-water flow for watershed, cfs, one
+basin_potet, Area-weighted average potential evapotranspiration for watershed, inches, one
+basin_ppt, Area-weighted average precipitation for watershed, inches, one
+basin_pweqv, Area-weighted average pack-water equivalent of snowpack for watershed, inches, one
+basin_reach_latflow, Area-weighted average lateral flow into stream reaches for watershed, cfs, one
+basin_sroff_cfs, Area-weighted average Hortonian and Dunnian surface runoff into stream reaches for watershed, cfs, one
+basin_ssflow_cfs, Area-weighted average interflow into stream reaches for watershed, cfs, one
+basinactet, Volumetric flow rate of evapotranspiration for watershed, (MF_L)3T-1, one
+basingravstor, Total volume of soil water in gravity reservoirs of soil zone for watershed, (MF_L)3, one
+basingw2sz, Volumetric flow rate of ground-water discharge added to soil zone for watershed, (MF_L)3T-1, one
+basininfilprev, Volumetric flow rate of soil infiltration into preferential-flow reservoirs of soil zone including precipitation; snowmelt; and cascading Hortonian flow for watershed, (MF_L)3T-1, one
+basininfil_tot, Volumetric flow rate of soil infiltration into capillary reservoirs of soil zone including precipitation, snowmelt, and cascading Hortonian flow for watershed, (MF_L)3T-1, one
+basininterflow, Volumetric flow rate of slow interflow to stream reaches for watershed, (MF_L)3T-1, one
+basinprefstor, Total volume of soil water in preferential-flow reservoirs of soil zone for watershed, (MF_L)3, one
+basinpweqv, Total volume of water in snowpack storage for watershed, (MF_L)3, one
+basinsnowevap, Volumetric flow rate of snowpack sublimation for watershed, (MF_L)3T-1, one
+basinsnowmelt, Volumetric flow rate of snowmelt for watershed, (MF_L)3T-1, one
+basinsoilmoist, Total volume of soil water in capillary reservoirs of soil zone for watershed, (MF_L)3, one
+basinsroff, Volumetric flow rate of Hortonian and Dunnian surface runoff for watershed, (MF_L)3T-1, one
+basinstrmflow, Volumetric flow rate of streamflow leaving the watershed, (MF_L)3T-1, one
+gw2sm, Average ground-water discharge to soil zone in an HRU, inches, nhru
+gwc_head, Head at each MODFLOW ground-water cell, MF_L, ngwcell
+gwflow2strms, Volumetric flow rate of ground-water discharge to stream reaches, (MF_L)3T-1, one
+hru_ppt, Adjusted precipitation on HRU, inches, nhru
+kkiter, Current iteration in GSFLOW simulation, dimensionless, one
+obsq_cfs, Streamflow at streamflow-gaging station, cfs, nobs
+pkwater_equiv, Pack-water equivalent of snowpack, inches, nhru
+reach_cfs, Streamflow leaving each stream reach, cfs, nreach
+reach_latflow, Lateral flow (surface runoff and interflow) into each stream reach, cfs, nreach
+reach_wse, Water-surface elevation in each stream reach, MF_L, nreach
+sat_store, Total storage in saturated MODFLOW cells, (MF_L)3, one
+sm2gw_grav, Gravity drainage from each gravity reservoir to each MODFLOW cell, inches, nhrucell
+snowcov_area, Fraction of snow-covered area on HRU, dimensionless, nhru
+snowmelt, Snowmelt from the snowpack on HRU, inches, nhru
+soil_moist, Water content of capillary reservoir for HRU, inches, nhru
+soil_moisture_pct, Decimal fraction of the saturation of capillary reservoir, dimensionless, nhru
+sroff, Surface runoff to streams for HRU, inches, nhru
+ssr_to_gw, Area-weighted average gravity drainage from soil zone for HRU, inches, nhru
+ssres_flow, Interflow to streams for HRU, inches, nhru
+ssres_stor, Average gravity reservoir storage for HRU, inches, nhru
+stream_leakage, Total leakage from stream segments to associated MODFLOW cells, (MF_L)3, one
+swrad, Computed shortwave radiation for HRU, langleys, nhru
