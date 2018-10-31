@@ -1,6 +1,5 @@
 # ID2447_classrepo
-Repository for Coupled Ground-Water/Surface-Water Modeling using GSFLOW
-
+Repository for Training material
 Coupled Ground-Water/Surface-Water Modeling using GSFLOW
 ID2447
 December 3-6, 2018
