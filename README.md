@@ -1,4 +1,4 @@
-# gw3099_classrepo
+# ID2447_classrepo
 Repository for Coupled Ground-Water/Surface-Water Modeling using GSFLOW
 
 Coupled Ground-Water/Surface-Water Modeling using GSFLOW
