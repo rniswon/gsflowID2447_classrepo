@@ -1,1 +1,1 @@
-C:\Python27\ArcGIS10.5\Scripts\jupyter-notebook.exe
+C:\Users\rniswon\AppData\Local\Continuum\miniconda2\Scripts\jupyter-notebook.exe
