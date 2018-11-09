@@ -32,65 +32,63 @@ Training will cover the procedures for applying GSFLOW to regional-scale basins 
 
 The following tentative agenda is based on a start time each morning of 8:30 AM and an ending time each day of 4:30 PM.  The agenda may be adjusted during the week in response to student requests.
 
-### Tuesday (Introduction to PRMS and MODFLOW)
+### Monday (Introduction to PRMS and MODFLOW)
 
 |Time      |Topic                            |Lead, Duration              |
 |----------|---------------------------------|----------------------------|
-|8:30 AM   |Introductions and Class Overview |30 minutes, Niswonger       |
-|9:30 AM   |                                 |                            |
-|10:30 AM  |BREAK                            |15 minutes                  |
-|10:45 AM  |                                 |                            |
-|12:00 PM  |LUNCH                            |                            |
-|1:15 PM   |                                 |                            |
-|2:15 PM   |                                 |                            |
-|3:15 PM   |BREAK				                     |                            |
-|3:30 PM   |                                 |                            |
-|4:30 PM   |ADJOURN                          |                            |
+|8:30 AM   |Introductions and Class Overview |15 minutes, Niswonger       |
+|8:45 AM   |Introduction to PRMS             |Regan/Markstrom             |
+|9:45 AM   |Break                            |15 minutes                  |
+|10:00 AM  |Introduction to PRMS (Continued) |Regan/Markstrom             |
+|10:45 PM  |PRMS and the NHM                 |Regan/Markstrom             |
+|11:30 PM  |Introduction to MODFLOW          |Niswonger                   |
+|12:00 PM  |Lunch                            |1 hour 15 minutes           |
+|1:15 PM   |Introduction to MODFLOW (Continued)|Niswonger                 |
+|2:45 PM   |Integration of PRMS and MODFLOW  |Markstrom/Regan/Niswonger   |
+|3:30 AM   |Break                            |15 minutes                  |
+|3:45 PM   |PRMS Model construction          |Gardner                     |
+|5:00 PM   |Adjourn                          |                            |
 
+
+### Tuesday ()
+
+|Time      |Topic                            |Lead, Duration              |
+|----------|---------------------------------|----------------------------|
+|8:30 AM   |PRMS Model construction (Continued)|Gardner                   |
+|10:30 AM  |BREAK                            |15 minutes                  |
+|10:45 AM  |MODFLOW Model construction       |Alzraiee                    |
+|12:00 AM  |Lunch                            |1 hour 15 minutes           |
+|1:15 PM   |MODFLOW Model construction (Continued)|Alzraiee               |
+|3:00 PM   |Break                            |15 minutes                  |
+|3:15 PM   |Overview GSFLOW output/post processing|Alzraiee/Niswonger/Regan|
+|4:30 PM   |Calibration of PRMS models       |Markstrom/Regan/Gardner/Alzraiee|
+|5:00 PM   |ADJOURN                          |                            |
 
 ### Wednesday ()
 
 |Time      |Topic                            |Lead, Duration              |
 |----------|---------------------------------|----------------------------|
-|8:30 AM   |                                 |                            |
-|9:30 AM   |                                 |                            |
+|8:30 AM   |Calibration of PRMS models       |Markstrom/Regan/Gardner/Alzraiee|
 |10:30 AM  |BREAK                            |15 minutes                  |
-|10:45 AM  |                                 |                            |
+|10:45 AM  |PRMS Calibration exercise        |Alzraiee/Niswonger          |
 |12:00 PM  |LUNCH                            |                            |
-|1:15 PM   |                                 |                            |
-|2:15 PM   |                                 |                            |
-|3:15 PM   |BREAK				                     |                            |
-|3:30 PM   |                                 |                            |
+|1:15 PM   |Calibration of MODFLOW models    |Alzraiee, Niswonger         |
+|2:45 PM   |BREAK                            |15 minutes                  |
+|3:00 PM   |Calibration of MODFLOW models (Continued)|Alzraiee, Niswonger |
+|4:00 PM   |Introduce class project objectives|Niswonger                  |
 |4:30 PM   |ADJOURN                          |                            |
 
 ### Thursday ()
 
 |Time      |Topic                            |Lead, Duration              |
 |----------|---------------------------------|----------------------------|
-|8:30 AM   |                                 |                            |
-|9:30 AM   |                                 |                            |
+|8:30 AM   |Work in groups on GSFLOW models  |                            |
 |10:30 AM  |BREAK                            |15 minutes                  |
-|10:45 AM  |                                 |                            |
+|10:45 AM  |Work in groups on GSFLOW models  |                            |
 |12:00 PM  |LUNCH                            |                            |
-|1:15 PM   |                                 |                            |
-|2:15 PM   |                                 |                            |
+|2:15 PM   |Work in groups on GSFLOW models  |                            |
 |3:15 PM   |BREAK				                     |                            |
-|3:30 PM   |                                 |                            |
-|4:30 PM   |ADJOURN                          |                            |
-
-### Friday ()
-
-|Time      |Topic                            |Lead, Duration              |
-|----------|---------------------------------|----------------------------|
-|8:30 AM   |                                 |                            |
-|9:30 AM   |                                 |                            |
-|10:30 AM  |BREAK                            |15 minutes                  |
-|10:45 AM  |                                 |                            |
-|12:00 PM  |LUNCH                            |                            |
-|1:15 PM   |                                 |                            |
-|2:15 PM   |                                 |                            |
-|3:15 PM   |BREAK				                     |                            |
-|3:30 PM   |                                 |                            |
+|3:30 PM   |Work in groups on GSFLOW models  |                            |
 |4:30 PM   |ADJOURN                          |                            |
 
 
@@ -98,11 +96,11 @@ The following tentative agenda is based on a start time each morning of 8:30 AM 
 
 * gsflow
 * ArcGIS (10.5 or newer)
-    * Python 2.7 package --- Jupyter
-* git
+    * Python 2.7 package
+    * git
 * Miniconda Python Distribution
-    * Python version 3.6 or newer
     * Jupyter
+    * Geopandas
     * Numpy
     * Matplotlib
     * Flopy
