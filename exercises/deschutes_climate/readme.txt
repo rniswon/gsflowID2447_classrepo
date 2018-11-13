@@ -1,1 +1,1 @@
-This example takes users through the creating of the PRMS climate parameters using precip_1sta and temp_lapse
+This example takes users through the creating of the PRMS climate parameters using precip_1sta and temp_1sta
