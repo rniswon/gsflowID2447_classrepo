@@ -41,3 +41,5 @@ veg_rasters/
 *.cpg
 
 *.param
+
+!exercises/saghen_prms/examples/sagehen/shapefiles/model_points.shp
