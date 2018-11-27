@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- AAA
 import os, sys
 import logging
 from control import Control
