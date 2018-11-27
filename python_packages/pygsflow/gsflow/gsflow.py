@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- AAA
+# -*- coding: utf-8 -*-
 import os, sys
 import logging
 from control import Control
@@ -206,7 +206,6 @@ class Gsflow():
             self.prms.control_file = self.control_file
 
             # change parameters
-
             for par_record in self.prms.parameters.parameters_list:
                 curr_file = os.path.basename(par_record.file_name)
                 curr_file = os.path.join(workspace, curr_file)
