@@ -32,7 +32,7 @@ veg_rasters/
 !exercises/saghen_prms/examples/sagehen/hru_params/prms_dimensions.csv
 !exercises/saghen_prms/examples/sagehen/hru_params/prms_parameters.csv
 
-*.param
+#*.param
 
 # Project specific files and file types
 *.mxd
@@ -40,6 +40,6 @@ veg_rasters/
 *.shp.xml
 *.cpg
 
-*.param
+#*.param
 
 !C:\Users\rniswon\Documents\Data\Git\gsflowID2447_classrepo\exercises\saghen_prms\examples\sagehen\shapefiles\model_points.shp
