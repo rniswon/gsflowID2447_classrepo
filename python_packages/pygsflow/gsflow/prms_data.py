@@ -9,10 +9,10 @@ class Prms_data(object):
         self.data_df = data_df
         self.data_names =  ['tmax', 'tmin', 'precip', 'runoff', 'pan_evap', 'solrad', 'from_data', 'rain_day']
 
-        if (data_df is None) and (not(data_file is None)) :
+        if (data_df == None) and (not(data_file == None)) :
            self.from_file()
 
-        if (data_df is None) and data_file is None :
+        if (data_df == None) and data_file == None :
             print(" Warning: This is empty data object")
 
 
