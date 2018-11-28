@@ -34,14 +34,14 @@ class Prms(object):
         # load parameters
         abs_files = []
         parm_files = self.control.get_values('param_file')
-        for ffn in parm_files:
-            f = supports._get_file_abs(control_file=self.control_file, fn=ffn)
-            abs_files.append(f)
-        self.parameters = Param(parameter_files=abs_files)
+        #for ffn in parm_files:
+            #f = supports._get_file_abs(control_file=self.control_file, fn=ffn)
+        #    abs_files.append(f)
+        self.parameters = Param(parameter_files=parm_files)
 
         # load data
         data_file = self.control.get_values('data_file')
-        data_file = supports._get_file_abs(control_file=self.control_file, fn=data_file[0])
+        #data_file = supports._get_file_abs(control_file=self.control_file, fn=data_file[0])
         self.Data = Prms_data(data_file=data_file)
 
         print ("Prms model is loaded .....")

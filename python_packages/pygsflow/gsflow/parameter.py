@@ -26,7 +26,12 @@ class Parameters(object):
 
         elif os.path.isfile(parameter_files[0]):
             self._parameter_files = parameter_files
+            print("Work on loadind the parameter files .....")
             self.from_file()
+        else:
+            print ("Cannot find the file {}".format(parameter_files[0]))
+            raise ValueError(" Cannot find the file {}".format(parameter_files[0]))
+
 
         self._record_names = []
         if not (self.parameters_list == None):
