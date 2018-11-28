@@ -6,6 +6,7 @@ from prms import Prms
 import supports
 import flopy
 import subprocess as sp
+
 if sys.version_info > (3, 0):
     import queue as Queue
 else:
@@ -13,10 +14,12 @@ else:
 from datetime import datetime
 import threading
 
+
 def load(control_file):
     gs = Gsflow(control_file=control_file)
     gs.load()
     return gs
+
 
 class Gsflow():
     def __init__(self, control_file=None, prms=None, mf=None, mf_load_only=None,
@@ -54,16 +57,19 @@ class Gsflow():
         print("Control file is loaded")
 
         # load prms
+        print("Working on loading PRMS model ...")
         self.prms = Prms(control=self.control)
-        print("PRMS files are loaded")
 
         # load modflow
         mode = self.control.get_values('model_mode')
         if 'GSFLOW' in mode[0] or 'MODFLOW' in mode[0]:
+            print ("Working on loading MODFLOW files ....")
             fname = self.control.get_values('modflow_name')
             fname = supports._get_file_abs(control_file=self.control_file, fn=fname[0])
             self._load_modflow(fname)
             self.mf.namefile = os.path.basename(self.control.get_values('modflow_name')[0])
+        else:
+            print ("There are no Modflow files, PRMS model only")
 
     def _load_modflow(self, fname):
         """
@@ -95,6 +101,7 @@ class Gsflow():
         fidw.close()
         bas_nam = os.path.basename(temp_fn)
         self.mf = flopy.modflow.Modflow.load(temp_fn, model_ws=mf_dir)
+        print ("MOSFLOW files are loaded ... ")
 
     # def change_ws(self, ws):
     #
@@ -179,9 +186,11 @@ class Gsflow():
 
         """
         # overwrite
+
         print("Writing the project files .....")
-        if not(workspace == None):
+        if not (workspace == None):
             workspace = os.path.abspath(workspace)
+
         if basename == None and workspace == None:
             print("Warning: input files will be overwritten....")
             self._write_all()
@@ -197,12 +206,10 @@ class Gsflow():
             self.prms.control_file = self.control_file
 
             # change parameters
-
             for par_record in self.prms.parameters.parameters_list:
                 curr_file = os.path.basename(par_record.file_name)
                 curr_file = os.path.join(workspace, curr_file)
                 par_record.file_name = curr_file
-
 
             # change datafile
             curr_file = os.path.basename(self.prms.Data.data_file)
@@ -212,6 +219,12 @@ class Gsflow():
             # change mf
             if not (self.mf == None):
                 self.mf.change_model_ws(workspace)
+                out_files_list = []
+                for out_file in self.mf.output_fnames:
+                    bbasename = os.path.basename(out_file)
+                    new_outfn = os.path.join(workspace, bbasename)
+                    out_files_list.append(new_outfn)
+                # self.mf.output_fnames = out_files_list
 
             # update file names in control object
             for rec_name in self.control._gslow_files:
@@ -220,7 +233,7 @@ class Gsflow():
                     file_value = []
                     for fil in file_values:
                         cnt_dir = os.path.dirname(self.control_file)
-                        va = os.path.join(cnt_dir, os.path.basename(fil))
+                        va = os.path.join(workspace, os.path.basename(fil))
                         file_value.append(va)
                     self.control.set_values(rec_name, file_value)
 
@@ -251,7 +264,14 @@ class Gsflow():
 
             # change mf
             if not (self.mf == None):
-                self.mf.change_base_file_name(basename)
+                self.mf._BaseModel__name = os.path.join(curr_dir, basename)
+                self.mf.name = os.path.join(curr_dir, basename)
+                out_files_list = []
+                for out_file in self.mf.output_fnames:
+                    ext = out_file.split(".")[-1]
+                    new_outfn = os.path.join(curr_dir, basename + "." + ext)
+                    out_files_list.append(new_outfn)
+                # self.mf.output_fnames = out_files_list
 
             # update file names in control object
             for rec_name in self.control._gslow_files:
@@ -261,7 +281,7 @@ class Gsflow():
                     for fil in file_values:
                         dir_name = os.path.dirname(fil)
                         if rec_name == 'modflow_name':
-                            mfname = basename+".nam"
+                            mfname = basename + ".nam"
                             filvalue = os.path.join(dir_name, mfname)
                         else:
                             vvfile = rec_name.split("_")
@@ -287,25 +307,44 @@ class Gsflow():
             self.control_file = self.control.control_file
 
             # change parameters
-            for ifile, par_record in enumerate(self.prms.Parameters.parameters_list):
-                par_file = basename + "_par_{}.params".format(ifile)
+            ## get param files list
+            flist = self.prms.parameters.parameter_files
+            new_param_file_list = []
+            for ifile, par_record in enumerate(self.prms.parameters.parameters_list):
+                file_index = flist.index(par_record.file_name)
+                par_file = basename + "_par_{}.params".format(file_index)
                 curr_file = os.path.join(workspace, par_file)
                 par_record.file_name = curr_file
-
+                if not (curr_file in new_param_file_list):
+                    new_param_file_list.append(curr_file)
+            self.control.set_values('param_file', new_param_file_list)
             # change datafile
             dfile = basename + "_dat.data"
             curr_file = os.path.join(workspace, dfile)
             self.prms.Data.data_file = curr_file
+            self.control.set_values('data_file', [curr_file])
 
             # change mf
+
             if not (self.mf == None):
                 self.mf.change_model_ws(workspace)
-                self.mf.change_base_file_name(basename)
+                self.mf.name = os.path.join(workspace, basename)
+                out_files_list = []
+                for out_file in self.mf.output_fnames:
+                    ext = out_file.split(".")[-1]
+                    new_outfn = os.path.join(workspace, basename + "." + ext)
+                    out_files_list.append(new_outfn)
+                # self.mf.output_fnames = out_files_list
+
+            mfnm = basename + ".nam"
+            self.control.set_values('modflow_name', [os.path.join(workspace, mfnm)])
 
             ## TODO: Update control file
             # update file names in control object
             for rec_name in self.control._gslow_files:
                 if rec_name in self.control._record_names:
+                    if rec_name in ['modflow_name', 'param_file', 'data_file']:
+                        continue
                     file_values = self.control.get_values(rec_name)
                     file_value = []
                     for fil in file_values:
@@ -313,37 +352,24 @@ class Gsflow():
                         if rec_name == 'modflow_name':
                             mfname = basename + ".nam"
                             filvalue = os.path.join(dir_name, mfname)
+                        elif rec_name == 'param_file':
+                            continue
+                        elif rec_name == 'data_file':
+                            continue
                         else:
                             vvfile = rec_name.split("_")
                             del vvfile[-1]
-                            vvfile = vvfile.join("_")
-                            ext = fil.split(".")[-1]
+                            vvfile = "_".join(vvfile)
+                            if "." in fil:
+                                ext = fil.split(".")[-1]
+                            else:
+                                ext = "dat"
                             vvfile = basename + "_" + vvfile + "." + ext
-                            filvalue = os.path.join(dir_name, vvfile)
+                            filvalue = os.path.join(workspace, vvfile)
 
-                        file_value.append(os.path.basename(filvalue))
+                        file_value.append(filvalue)
                     self.control.set_values(rec_name, file_value)
 
-                    # update file names in control object
-                    for rec_name in self.control._gslow_files:
-                        if rec_name in self.control._record_names:
-                            file_values = self.control.get_values(rec_name)
-                            file_value = []
-                            for fil in file_values:
-                                dir_name = os.path.dirname(fil)
-                                if rec_name == 'modflow_name':
-                                    mfname = basename + ".nam"
-                                    filvalue = os.path.join(workspace, mfname)
-                                else:
-                                    vvfile = rec_name.split("_")
-                                    del vvfile[-1]
-                                    vvfile = vvfile.join("_")
-                                    ext = fil.split(".")[-1]
-                                    vvfile = basename + "_" + vvfile + "." + ext
-                                    filvalue = os.path.join(workspace, vvfile)
-
-                                file_value.append(os.path.basename(filvalue))
-                            self.control.set_values(rec_name, file_value)
             self.prms.control = self.control
             self._write_all()
             return
@@ -371,13 +397,25 @@ class Gsflow():
         fn = self.control_file
         cnt_folder = os.path.dirname(fn)
         fnm = os.path.abspath(fn)
-        self.__run(exe_name = self.gsflow_exe , namefile = fn)
+        if not os.path.isfile(self.gsflow_exe):
+            print ("Warning : The executable of the model is not specified. Use .gsflow_exe "
+                   "to define its path... ")
+            return None
+        self.__run(exe_name=self.gsflow_exe, namefile=fn)
 
+    def _generate_batch_file(self):
+        fn = os.path.dirname(self.control_file)
+        fn = os.path.join(fn, "__run_gsflow.bat")
+        self.__bat_file = fn
+        fidw = open(fn, 'w')
+        cmd = self.gsflow_exe + " " + self.control_file
+        fidw.write(cmd)
+        fidw.close()
 
     def __run(self, exe_name, namefile, model_ws='./',
-                  silent=False, pause=False, report=False,
-                  normal_msg='normal termination',
-                  async=False, cargs=None):
+              silent=False, pause=False, report=False,
+              normal_msg='normal termination',
+              async=False, cargs=None):
         """
         This function will run the model using subprocess.Popen.  It
         communicates with the model's stdout asynchronously and reports
@@ -487,6 +525,9 @@ class Gsflow():
                 argv.append(t)
 
         # run the model with Popen
+        self._generate_batch_file()
+        argv = self.__bat_file
+        model_ws = os.path.dirname(self.control_file)
         proc = sp.Popen(argv,
                         stdout=sp.PIPE, stderr=sp.STDOUT, cwd=model_ws)
 
@@ -555,4 +596,3 @@ class Gsflow():
         if pause:
             input('Press Enter to continue...')
         return success, buff
-
