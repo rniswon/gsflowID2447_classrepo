@@ -3,7 +3,7 @@ PRMS Control File for Sagehen
 mapOutVar_names
 1
 4
-.\output\recharge
+..\output\recharge
 ####
 nmapOutVars
 1
@@ -47,7 +47,7 @@ sroff
 ani_output_file
 1
 4
-.\output\animation.out
+..\output\animation.out
 ####
 csv_output_file
 1
@@ -57,12 +57,12 @@ gsflow.csv
 model_output_file
 1
 4
-.\output\gsflow_prms.out
+..\output\gsflow_prms.out
 ####
 data_file
 1
 4
-./input/sagehen_datafile_1sta.data
+../input/sagehen_datafile_1sta.data
 ####
 dispGraphsBuffSize
 1
@@ -199,10 +199,10 @@ ndispGraphs
 param_file
 4
 4
-./input/calibration_parameters.param
-./input/cascade.param
-./input/default_values.param
-./input/gis_derived_parameters.param
+../input/calibration_parameters.param
+../input/cascade.param
+../input/default_values.param
+../input/gis_derived_parameters.param
 ####
 precip_module
 1
