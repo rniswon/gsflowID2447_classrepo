@@ -113,6 +113,7 @@ class Control(object):
 
     def _make_pths_abs(self):
         for file in self._gslow_files:
+
             if file in self._record_names:
                 gs_fn = self.get_values(file)
                 flist = []
@@ -122,8 +123,10 @@ class Control(object):
                 self.set_values(file, flist)
 
     def _get_file_abs(self, control_file=None, fn=None):
-        control_folder = os.path.dirname(os.path.dirname(control_file))
-
+        fn = os.path.normpath(fn)
+        if os.path.isabs(fn):
+            return fn
+        control_folder = os.path.dirname(control_file)
         abs_file = os.path.abspath(os.path.join(control_folder, fn))
         return abs_file
 
