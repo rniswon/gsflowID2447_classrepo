@@ -154,7 +154,7 @@ prmsIV.exe
 gsflow_output_file
 1
 4
-./output/gsflow.out
+../output/gsflow.out
 ####
 init_vars_from_file
 1
@@ -279,7 +279,7 @@ basin_recharge
 stat_var_file
 1
 4
-./output/sagehen_statvar.dat
+../output/sagehen_statvar.dat
 ####
 statsON_OFF
 1
@@ -304,12 +304,12 @@ temp_1sta
 var_save_file
 1
 4
-./output/prms_ic.out
+../output/prms_ic.out
 ####
 stats_output_file
 1
 4
-./output/stats1.out
+../output/stats1.out
 ####
 var_init_file
 1
