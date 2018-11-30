@@ -1,7 +1,7 @@
 #--------------------------------
 # Name:         soil_raster_prep.py
 # Purpose:      GSFLOW soil raster prep
-# Notes:        ArcGIS 10.2 Version
+# Notes:        ArcGIS 10.2+ Version
 # Python:       2.7
 #--------------------------------
 
@@ -18,18 +18,19 @@ from arcpy import env
 import support_functions as support
 
 
-def soil_raster_prep(config_path, overwrite_flag=False, debug_flag=False):
+def soil_raster_prep(config_path):
     """Prepare GSFLOW soil rasters
 
-    Args:
-        config_file (str): Project config file path
-        ovewrite_flag (bool): if True, overwrite existing files
-        debug_flag (bool): if True, enable debug level logging
+    Parameters
+    ----------
+    config_path : str
+        Project configuration file (.ini) path.
 
-    Returns:
-        None
+    Returns
+    -------
+    None
+
     """
-
     # Initialize hru_parameters class
     hru = support.HRUParameters(config_path)
 
@@ -86,7 +87,7 @@ def soil_raster_prep(config_path, overwrite_flag=False, debug_flag=False):
         ssr2gw_mult_flag = False
         logging.info(
             '  Missing INI parameter, setting {} = {}'.format(
-                'ssr2gw_flag', ssr2gw_flag))
+                'ssr2gw_mult_flag', ssr2gw_mult_flag))
     if ssr2gw_mult_flag:
         ssr2gw_mult_name = inputs_cfg.get('INPUTS', 'ssr2gw_mult_name')
 
@@ -124,7 +125,8 @@ def soil_raster_prep(config_path, overwrite_flag=False, debug_flag=False):
         logging.error('\nERROR: Soil depth raster does not exist')
         sys.exit()
     if ssr2gw_mult_flag and not arcpy.Exists(ssr2gw_mult_orig_path):
-        logging.error('\nERROR: Geology based raster for ssr2gw multiplier does not exist')
+        logging.error('\nERROR: Geology based raster for ssr2gw multiplier '
+                      'does not exist')
         sys.exit()
 
     # Check other inputs
@@ -319,7 +321,8 @@ def soil_raster_prep(config_path, overwrite_flag=False, debug_flag=False):
             logging.info('  {}'.format(soil_raster_path))
             # DEADBEEF - Check if there is any nodata to be filled first?
             mask_obj = arcpy.sa.Int(1000 * arcpy.sa.SetNull(
-               arcpy.sa.Raster(soil_raster_path) < 0,arcpy.sa.Raster(soil_raster_path)))
+                arcpy.sa.Raster(soil_raster_path) < 0,
+                arcpy.sa.Raster(soil_raster_path)))
             input_obj = arcpy.sa.Con(arcpy.sa.IsNull(mask_obj), 0, mask_obj)
             nibble_obj = 0.001 * arcpy.sa.Nibble(input_obj, mask_obj, 'ALL_VALUES')
             nibble_obj.save(soil_raster_path)
@@ -335,9 +338,6 @@ def arg_parse():
         '-i', '--ini', required=True,
         help='Project input file', metavar='PATH')
     parser.add_argument(
-        '-o', '--overwrite', default=False, action="store_true",
-        help='Force overwrite of existing files')
-    parser.add_argument(
         '-d', '--debug', default=logging.INFO, const=logging.DEBUG,
         help='Debug level logging', action="store_const", dest="loglevel")
     args = parser.parse_args()
@@ -345,6 +345,7 @@ def arg_parse():
     # Convert input file to an absolute path
     if os.path.isfile(os.path.abspath(args.ini)):
         args.ini = os.path.abspath(args.ini)
+
     return args
 
 
@@ -359,7 +360,4 @@ if __name__ == '__main__':
     logging.info(log_f.format('Current Directory:', os.getcwd()))
     logging.info(log_f.format('Script:', os.path.basename(sys.argv[0])))
 
-    # Prepare GSFLOW Soil Rasters
-    soil_raster_prep(
-        config_path=args.ini, overwrite_flag=args.overwrite,
-        debug_flag=args.loglevel==logging.DEBUG)
+    soil_raster_prep(config_path=args.ini)

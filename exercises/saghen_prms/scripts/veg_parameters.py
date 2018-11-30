@@ -1,8 +1,7 @@
 #--------------------------------
 # Name:         veg_parameters
 # Purpose:      GSFLOW vegetation parameters
-# Notes:        ArcGIS 10.2 Version
-# Created       2017-08-25
+# Notes:        ArcGIS 10.2+ Version
 # Python:       2.7
 #--------------------------------
 
@@ -19,18 +18,19 @@ from arcpy import env
 import support_functions as support
 
 
-def veg_parameters(config_path, overwrite_flag=False, debug_flag=False):
+def veg_parameters(config_path):
     """Calculate GSFLOW Vegetation Parameters
 
-    Args:
-        config_file (str): Project config file path
-        ovewrite_flag (bool): if True, overwrite existing files
-        debug_flag (bool): if True, enable debug level logging
+    Parameters
+    ----------
+    config_path : str
+        Project configuration file (.ini) path.
 
-    Returns:
-        None
+    Returns
+    -------
+    None
+
     """
-
     # Initialize hru_parameters class
     hru = support.HRUParameters(config_path)
 
@@ -72,8 +72,6 @@ def veg_parameters(config_path, overwrite_flag=False, debug_flag=False):
 
     # Remap
     remap_ws = inputs_cfg.get('INPUTS', 'remap_folder')
-    aspect_remap_name = inputs_cfg.get('INPUTS', 'aspect_remap')
-    temp_adj_remap_name = inputs_cfg.get('INPUTS', 'temp_adj_remap')
     cov_type_remap_name = inputs_cfg.get('INPUTS', 'cov_type_remap')
     covden_sum_remap_name = inputs_cfg.get('INPUTS', 'covden_sum_remap')
     covden_win_remap_name = inputs_cfg.get('INPUTS', 'covden_win_remap')
@@ -159,29 +157,6 @@ def veg_parameters(config_path, overwrite_flag=False, debug_flag=False):
     for remap_path in remap_path_list:
         support.remap_check(remap_path)
 
-    # DEADBEEF
-    # if not os.path.isfile(cov_type_remap_path):
-    #    logging.error('\nERROR: Cover type remap file does not exist')
-    #    sys.exit()
-    # if not os.path.isfile(covden_sum_remap_path):
-    #    logging.error('\nERROR: Summer cover density remap file does not exist')
-    #    sys.exit()
-    # if not os.path.isfile(covden_win_remap_path):
-    #    logging.error('\nERROR: Winter cover density remap file does not exist')
-    #    sys.exit()
-    # if not os.path.isfile(snow_intcp_remap_path):
-    #    logging.error('\nERROR: Winter snow interception remap file does not exist')
-    #    sys.exit()
-    # if not os.path.isfile(srain_intcp_remap_path):
-    #    logging.error('\nERROR: Summer rain interception remap file does not exist')
-    #    sys.exit()
-    # if not os.path.isfile(wrain_intcp_remap_path):
-    #    logging.error('\nERROR: Winter rain interception remap file does not exist')
-    #    sys.exit()
-    # if not os.path.isfile(root_depth_remap_path):
-    #    logging.error('\nERROR: Root depth remap file does not exist')
-    #    sys.exit()
-
     # Check other inputs
     if veg_type_cs <= 0:
         logging.error('\nERROR: Veg. type cellsize must be greater than 0')
@@ -225,18 +200,13 @@ def veg_parameters(config_path, overwrite_flag=False, debug_flag=False):
     support.add_field_func(hru.polygon_path, hru.wrain_intcp_field, 'DOUBLE')
     # support.add_field_func(hru.polygon_path, hru.root_depth_field, 'DOUBLE')
 
-
     # Check that remaps have all necessary values
     logging.info(
         '\nChecking remap tables against all raster cells'
         '  (i.e. even those outside the study area)')
     check_remap_keys(cov_type_remap_path, veg_type_orig_path)
     check_remap_keys(covden_sum_remap_path, veg_cover_orig_path)
-    # check_remap_keys(snow_intcp_remap_path, veg_type_orig_path)
-    # check_remap_keys(srain_intcp_remap_path, veg_type_orig_path)
-    # check_remap_keys(wrain_intcp_remap_path, veg_type_orig_path)
     check_remap_keys(root_depth_remap_path, veg_type_orig_path)
-
 
     # Assume all vegetation rasters will need to be rebuilt
     # Check veg cover and veg type rasters
@@ -301,7 +271,6 @@ def veg_parameters(config_path, overwrite_flag=False, debug_flag=False):
     #    veg_type_orig_sr)
     # arcpy.ClearEnvironment('extent')
     del transform_str, veg_type_orig_sr, veg_type_obj
-
 
     # Reclassifying vegetation cover type
     logging.info('\nCalculating COV_TYPE')
@@ -372,7 +341,6 @@ def veg_parameters(config_path, overwrite_flag=False, debug_flag=False):
     rad_trncf_obj.save(rad_trncf_path)
     del rad_trncf_obj
 
-
     # List of rasters, fields, and stats for zonal statistics
     zs_veg_dict = dict()
     zs_veg_dict[hru.cov_type_field] = [cov_type_path, 'MAJORITY']
@@ -384,12 +352,10 @@ def veg_parameters(config_path, overwrite_flag=False, debug_flag=False):
     # zs_veg_dict[hru.root_depth_field] = [root_depth_path, 'MEAN']
     zs_veg_dict[hru.rad_trncf_field] = [rad_trncf_path, 'MEAN']
 
-
     # Calculate zonal statistics
     logging.info('\nCalculating vegetation zonal statistics')
     support.zonal_stats_func(
         zs_veg_dict, hru.polygon_path, hru.point_path, hru)
-
 
     # Short-wave radiation transmission coefficient
     # logging.info('\nCalculating {}'.format(hru.rad_trncf_field))
@@ -397,7 +363,6 @@ def veg_parameters(config_path, overwrite_flag=False, debug_flag=False):
     #    hru.polygon_path, hru.rad_trncf_field,
     #    '0.9917 * math.exp(-2.7557 * !{}!)'.format(hru.covden_win_field),
     #    'PYTHON')
-
 
     # Clear COV_TYPE values for lake cells (HRU_TYPE == 2)
     if True:
@@ -465,9 +430,6 @@ def arg_parse():
         '-i', '--ini', required=True,
         help='Project input file', metavar='PATH')
     parser.add_argument(
-        '-o', '--overwrite', default=False, action="store_true",
-        help='Force overwrite of existing files')
-    parser.add_argument(
         '-d', '--debug', default=logging.INFO, const=logging.DEBUG,
         help='Debug level logging', action="store_const", dest="loglevel")
     args = parser.parse_args()
@@ -475,6 +437,7 @@ def arg_parse():
     # Convert input file to an absolute path
     if os.path.isfile(os.path.abspath(args.ini)):
         args.ini = os.path.abspath(args.ini)
+
     return args
 
 
@@ -489,7 +452,4 @@ if __name__ == '__main__':
     logging.info(log_f.format('Current Directory:', os.getcwd()))
     logging.info(log_f.format('Script:', os.path.basename(sys.argv[0])))
 
-    # Calculate GSFLOW Vegetation Parameters
-    veg_parameters(
-        config_path=args.ini, overwrite_flag=args.overwrite,
-        debug_flag=args.loglevel==logging.DEBUG)
+    veg_parameters(config_path=args.ini)

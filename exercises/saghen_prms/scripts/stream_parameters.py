@@ -1,7 +1,7 @@
 #--------------------------------
 # Name:         stream_parameters.py
 # Purpose:      GSFLOW stream parameters
-# Notes:        ArcGIS 10.2 Version
+# Notes:        ArcGIS 10.2+ Version
 # Python:       2.7
 #--------------------------------
 
@@ -12,6 +12,7 @@ import datetime as dt
 import logging
 import math
 import os
+import pprint
 import shutil
 import subprocess
 import sys
@@ -23,18 +24,19 @@ from arcpy import env
 import support_functions as support
 
 
-def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
+def stream_parameters(config_path):
     """Calculate GSFLOW Stream Parameters
 
-    Args:
-        config_file (str): Project config file path
-        ovewrite_flag (bool): if True, overwrite existing files
-        debug_flag (bool): if True, enable debug level logging
+    Parameters
+    ----------
+    config_path : str
+        Project configuration file (.ini) path.
 
-    Returns:
-        None
+    Returns
+    -------
+    None
+
     """
-
     # Initialize hru_parameters class
     hru = support.HRUParameters(config_path)
 
@@ -91,16 +93,17 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
     # Intentionally not allowing user to change this value
     crt_iprn = 1
 
-    # CRT Fill Parameters
-    # fill_strmflg = 0
-    # fill_visflg = 0
-    # fill_ifill = 1
-
-    # CRT Streams paramters
+    # CRT streams/cascade parameters
     crt_ws = os.path.join(hru.param_ws, 'cascade_work')
     crt_strmflg = 1
     crt_visflg = 1
     crt_ifill = 1
+
+    # CRT groundwater cascades
+    gw_ws = os.path.join(hru.param_ws, 'cascade_gw_work')
+    gw_strmflg = 1
+    gw_visflg = 1
+    gw_ifill = 1
 
     # CRT Executable
     crt_exe_path = inputs_cfg.get('INPUTS', 'crt_exe_path')
@@ -169,11 +172,15 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
         os.mkdir(stream_temp_ws)
     if not os.path.isdir(crt_ws):
         os.mkdir(crt_ws)
+    if not os.path.isdir(gw_ws):
+        os.mkdir(gw_ws)
 
     # Copy CRT executable if necessary
     crt_exe_name = os.path.basename(crt_exe_path)
     if not os.path.isfile(os.path.join(crt_ws, crt_exe_name)):
         shutil.copy(crt_exe_path, crt_ws)
+    if not os.path.isfile(os.path.join(gw_ws, crt_exe_name)):
+        shutil.copy(crt_exe_path, gw_ws)
     if not os.path.isfile(os.path.join(crt_ws, crt_exe_name)):
         logging.error(
             '\nERROR: CRT executable ({}) does not exist\n'.format(
@@ -186,6 +193,13 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
     crt_land_elev_path = os.path.join(crt_ws, 'LAND_ELEV.DAT')
     crt_stream_cells_path = os.path.join(crt_ws, 'STREAM_CELLS.DAT')
     crt_xy_path = os.path.join(crt_ws, 'XY.DAT')
+
+    # Groundwater cascades files
+    gw_hru_casc_path = os.path.join(gw_ws, 'HRU_CASC.DAT')
+    gw_outflow_hru_path = os.path.join(gw_ws, 'OUTFLOW_HRU.DAT')
+    gw_land_elev_path = os.path.join(gw_ws, 'LAND_ELEV.DAT')
+    gw_stream_cells_path = os.path.join(gw_ws, 'STREAM_CELLS.DAT')
+    gw_xy_path = os.path.join(gw_ws, 'XY.DAT')
 
     # Output names
     dem_adj_raster_name = 'dem_adj'
@@ -251,9 +265,6 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
         for row in update_c:
             if (int(row[0]) in [1, 3] and int(row[1]) > 0):
                 row[4], row[5], row[6] = 1, int(row[2]), int(row[3])
-            # DEADBEEF
-            # if (int(row[0]) == 1 or int(row[0]) == 3) and int(row[1]) > 0:
-            #     row[4], row[5], row[6] = 1, int(row[2]), int(row[3])
             else:
                 row[4], row[5], row[6] = 0, 0, 0
             update_c.updateRow(row)
@@ -289,50 +300,51 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
     del length_dict, length_field, fields, hru_polygon_lyr
 
     # Get list of segments and downstream cell for each stream/lake cell
-    # Downstream is calulated from flow direction
+    # Downstream is calculated from flow direction
     # Use IRUNBOUND instead of ISEG, since ISEG will be zeroed for lakes
+    # DEADBEEF - I don't think ISEG will be zero for lakes anymore
     logging.info('Cell out-flow dictionary')
     cell_dict = dict()
     fields = [
         hru.type_field, hru.krch_field, hru.lake_id_field, hru.iseg_field,
-        hru.irunbound_field, hru.subbasin_field, hru.dem_adj_field,
-        hru.flow_dir_field, hru.col_field, hru.row_field, hru.id_field]
+        hru.irunbound_field, hru.dem_adj_field, hru.flow_dir_field,
+        hru.col_field, hru.row_field, hru.id_field]
     for row in arcpy.da.SearchCursor(hru.polygon_path, fields):
         # Skip inactive cells
         if int(row[0]) == 0:
             continue
-        # DEADBEEF
-        # Skip cells flowing to inactive water
-        # elif int(row[0]) == 3:
-        #    continue
         # Skip if not lake and not stream
         elif (int(row[1]) == 0 and int(row[2]) == 0):
             continue
+
+        # ROW / COL
+        cell = (int(row[7]), int(row[8]))
+
         # Read in parameters
-        cell = (int(row[8]), int(row[9]))
-        # support.next_row_col(FLOW_DIR, CELL)
-        # HRU_ID, ISEG,  NEXT_CELL, DEM_ADJ, X, X, X
+        # HRU_ID, ISEG, support.next_row_col(FLOW_DIR, CELL), DEM_ADJ, X, X, X
         cell_dict[cell] = [
-            int(row[10]), int(row[4]),
-            support.next_row_col(int(row[7]), cell),
-            float(row[6]), 0, 0, 0]
-        del cell
+            int(row[9]), int(row[4]), support.next_row_col(int(row[6]), cell),
+            float(row[5]), 0, 0, 0]
+
     # Build list of unique segments
     iseg_list = sorted(list(set([v[1] for v in cell_dict.values()])))
 
-
     # Calculate IREACH and OUTSEG
-    logging.info('Calculate IREACH and OUTSEG')
+    logging.info('Calculate {} and {}'.format(
+        hru.reach_field, hru.outseg_field))
     outseg_dict = dict()
     for iseg in sorted(iseg_list):
         logging.debug('    Segment: {}'.format(iseg))
+
         # Subset of cell_dict for current iseg
-        iseg_dict = dict(
-            [(k, v) for k, v in cell_dict.items() if v[1] == iseg])
+        iseg_dict = dict([(k, v) for k, v in cell_dict.items() if v[1] == iseg])
+
         # List of all cells in current iseg
         iseg_cells = iseg_dict.keys()
+
         # List of out_cells for all cells in current iseg
         out_cells = [value[2] for value in iseg_dict.values()]
+
         # Every iseg will (should?) have one out_cell
         out_cell = list(set(out_cells) - set(iseg_cells))
 
@@ -349,6 +361,7 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
                     '\n  Lake cell elevations may not be constant\n'.format(
                         iseg, out_cell))
                 sys.exit()
+
             # If not output cell, assume edge of domain
             try:
                 outseg = cell_dict[out_cell[0]][1]
@@ -357,23 +370,26 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
 
             # Track sub-basin outseg
             outseg_dict[iseg] = outseg
+
             # Calculate reach number for each cell
             reach_dict = dict()
             start_cell = list(set(iseg_cells) - set(out_cells))[0]
-            for i in xrange(len(out_cells)):
+            for i in range(len(out_cells)):
                 # logging.debug('    Reach: {}  Cell: {}'.format(i+1, start_cell))
                 reach_dict[start_cell] = i + 1
                 start_cell = iseg_dict[start_cell][2]
+
             # For each cell in iseg, save outseg, reach, & maxreach
             for iseg_cell in iseg_cells:
                 cell_dict[iseg_cell][4:] = [
                     outseg, reach_dict[iseg_cell], len(iseg_cells)]
             del reach_dict, start_cell, outseg
         # Lakes
-        elif iseg < 0:
+        else:
             # For lake cells, there can be multiple outlets if all of them
             #   are to inactive cells or out of the model
             # Otherwise, like streams, there should only be one outcell per iseg
+            logging.debug('  Length: {}'.format(len(out_cells)))
             if len(out_cell) == 1:
                 try:
                     outseg = cell_dict[out_cell[0]][1]
@@ -383,22 +399,26 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
                   all(x[0] not in cell_dict.keys() for x in out_cell)):
                 outseg = exit_seg
                 logging.debug(
-                    ('  All out cells are inactive, setting outseg '
-                     'to exit_seg {}').format(exit_seg))
+                    '  All out cells are inactive, setting outseg '
+                    'to exit_seg {}'.format(exit_seg))
             else:
-                logging.error((
+                logging.error(
                     '\nERROR: ISEG {} has more than one out put cell'
                     '\n  Out cells: {}'
                     '\n  Check for streams exiting then re-entering a lake'
-                    '\n  Lake cell elevations may not be constant\n').format(
+                    '\n  Lake cell elevations may not be constant\n'.format(
                          iseg, out_cell))
+                raw_input('ENTER')
+
             # Track sub-basin outseg
             outseg_dict[iseg] = outseg
+
             # For each lake segment cell, only save outseg
             # All lake cells are routed directly to the outseg
             for iseg_cell in iseg_cells:
                 cell_dict[iseg_cell][4:] = [outseg, 0, 0]
             del outseg
+
         del iseg_dict, iseg_cells, iseg
         del out_cells, out_cell
 
@@ -439,7 +459,7 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
     with arcpy.da.UpdateCursor(hru.polygon_path, fields) as update_c:
         for row in update_c:
             if (int(row[0]) == 1 and int(row[1]) != 0 and
-                int(row[1]) in upseg_dict.keys()):
+                    int(row[1]) in upseg_dict.keys()):
                 row[2] = upseg_dict[int(row[1])]
             else:
                 row[2] = 0
@@ -486,18 +506,25 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
                 row[2] = 0
             update_c.updateRow(row)
 
+    # # Set all swale cells back to hru_type 2 (lake)
+    # logging.info('Swale HRU_TYPE')
+    # with arcpy.da.UpdateCursor(hru.polygon_path, [hru.type_field]) as update_c:
+    #     for row in update_c:
+    #         if int(row[0]) == 3:
+    #             row[0] = 2
+    #             update_c.updateRow(row)
+
     # Set all lake iseg to 0
     logging.info('Lake ISEG')
-    update_rows = arcpy.UpdateCursor(hru.polygon_path)
-    for row in update_rows:
-        if int(row.getValue(hru.type_field)) != 2:
-            continue
-        iseg = int(row.getValue(hru.iseg_field))
-        if iseg < 0:
-            row.setValue(hru.iseg_field, 0)
-        update_rows.updateRow(row)
-        del row, iseg
-    del update_rows
+    fields = [hru.type_field, hru.iseg_field]
+    with arcpy.da.UpdateCursor(hru.polygon_path, fields) as update_c:
+        for row in update_c:
+            if int(row[0]) != 2:
+                continue
+            iseg = int(row[1])
+            if iseg < 0:
+                row[1] = 0
+                update_c.updateRow(row)
 
     # Set environment parameters
     env.extent = hru.extent
@@ -553,6 +580,7 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
     logging.info('\nBuilding output CRT files')
 
     # Generate STREAM_CELLS.DAT file for CRT
+    # Include non-lake SWALES in streams file
     logging.info('  {}'.format(
         os.path.basename(crt_stream_cells_path)))
     stream_cells_list = []
@@ -560,7 +588,7 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
         hru.type_field, hru.iseg_field, hru.reach_field,
         hru.col_field, hru.row_field]
     for row in arcpy.da.SearchCursor(hru.polygon_path, fields):
-        if int(row[0]) == 1 and int(row[1]) > 0:
+        if int(row[0]) in [1, 3] and int(row[1]) > 0:
             stream_cells_list.append(
                 [int(row[4]), int(row[3]), int(row[1]), int(row[2]), 1])
     if stream_cells_list:
@@ -669,12 +697,84 @@ def stream_parameters(config_path, overwrite_flag=False, debug_flag=False):
         output_data = [l.strip() for l in f.readlines()]
     f.close()
 
-    # Check if there are
+    # Check if there are errors
     if 'CRT FOUND UNDECLARED SWALE HRUS' in output_data:
         logging.error(
             '\nERROR: CRT found undeclared swale HRUs (sinks)\n'
             '  All sinks must be filled before generating cascades\n'
             '  Check the CRT outputstat.txt file\n')
+        sys.exit()
+    elif 'CRT EXECUTION COMPLETE' not in output_data:
+        logging.error('\nERROR: CRT did not successfully complete\n')
+        sys.exit()
+
+
+
+
+    # Rerun CRT without lakes to build groundwater cascades
+    # This is only needed if there are lakes in the model
+    # For now the input files are being coped from the cascade_work folder
+    # (except HRU_CASC.DAT)
+    logging.debug('\nRemoving existing CRT fill files')
+    if os.path.isfile(gw_hru_casc_path):
+        os.remove(gw_hru_casc_path)
+    if os.path.isfile(gw_outflow_hru_path):
+        os.remove(gw_outflow_hru_path)
+    if os.path.isfile(gw_land_elev_path):
+        os.remove(gw_land_elev_path)
+    if os.path.isfile(gw_stream_cells_path):
+        os.remove(gw_stream_cells_path)
+    if os.path.isfile(gw_xy_path):
+        os.remove(gw_xy_path)
+
+    logging.info('\nCopying cascade CRT files (except HRU_CASC.DAT)')
+    shutil.copy(crt_outflow_hru_path, gw_outflow_hru_path)
+    shutil.copy(crt_land_elev_path, gw_land_elev_path)
+    shutil.copy(crt_stream_cells_path, gw_stream_cells_path)
+    shutil.copy(crt_xy_path, gw_xy_path)
+
+    # Input parameters files for Cascade Routing Tool (CRT)
+    logging.info('\nBuilding groundwater cascade CRT files')
+
+    # Generate HRU_CASC.DAT for CRT
+    logging.info('  {}'.format(os.path.basename(gw_hru_casc_path)))
+    with open(hru_type_ascii, 'r') as f:
+        ascii_data = f.readlines()
+    f.close()
+    hru_casc_header = (
+        '{} {} {} {} {} {} {} {}     '
+        'HRUFLG STRMFLG FLOWFLG VISFLG IPRN IFILL DPIT OUTITMAX\n').format(
+            crt_hruflg, crt_strmflg, crt_flowflg, crt_visflg,
+            crt_iprn, crt_ifill, crt_dpit, crt_outitmax)
+    with open(gw_hru_casc_path, 'w+') as f:
+        f.write(hru_casc_header)
+        for ascii_line in ascii_data[6:]:
+            # Convert all lakes to active
+            # Should swales (type 3) be converted also?
+            f.write(ascii_line.replace('2', '1'))
+    f.close()
+    del hru_casc_header, ascii_data
+
+    # Run CRT
+    logging.info('\nRunning CRT for groundwater cascades')
+    subprocess.check_output(crt_exe_name, cwd=gw_ws, shell=True)
+
+    # Read in outputstat.txt to check for errors
+    logging.info('\nReading CRT {}'.format(output_name))
+    output_path = os.path.join(gw_ws, output_name)
+    with open(output_path, 'r') as f:
+        output_data = [l.strip() for l in f.readlines()]
+    f.close()
+
+    # Check if there are errors
+    if 'CRT FOUND UNDECLARED SWALE HRUS' in output_data:
+        logging.error(
+            '\nERROR: CRT found undeclared swale HRUs (sinks)\n'
+            '  All sinks must be filled before generating cascades\n'
+            '  Check the CRT outputstat.txt file\n')
+        sys.exit()
+    elif 'CRT EXECUTION COMPLETE' not in output_data:
+        logging.error('\nERROR: CRT did not successfully complete\n')
         sys.exit()
 
 
@@ -697,9 +797,6 @@ def arg_parse():
         '-i', '--ini', required=True,
         help='Project input file', metavar='PATH')
     parser.add_argument(
-        '-o', '--overwrite', default=False, action='store_true',
-        help='Force overwrite of existing files')
-    parser.add_argument(
         '-d', '--debug', default=logging.INFO, const=logging.DEBUG,
         help='Debug level logging', action='store_const', dest='loglevel')
     args = parser.parse_args()
@@ -707,6 +804,7 @@ def arg_parse():
     # Convert input file to an absolute path
     if os.path.isfile(os.path.abspath(args.ini)):
         args.ini = os.path.abspath(args.ini)
+
     return args
 
 
@@ -722,6 +820,4 @@ if __name__ == '__main__':
     logging.info(log_f.format('Script:', os.path.basename(sys.argv[0])))
 
     # Calculate GSFLOW Stream Parameters
-    stream_parameters(
-        config_path=args.ini, overwrite_flag=args.overwrite,
-        debug_flag=args.loglevel==logging.DEBUG)
+    stream_parameters(config_path=args.ini)
