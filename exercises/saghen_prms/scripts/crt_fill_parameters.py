@@ -1,7 +1,7 @@
 #--------------------------------
 # Name:         crt_fill_parameters.py
 # Purpose:      GSFLOW CRT fill parameters
-# Notes:        ArcGIS 10.2 Version
+# Notes:        ArcGIS 10.2+ Version
 # Python:       2.7
 #--------------------------------
 
@@ -12,6 +12,7 @@ import datetime as dt
 import logging
 import math
 import os
+import pprint
 import shutil
 import subprocess
 import sys
@@ -22,18 +23,19 @@ from arcpy import env
 import support_functions as support
 
 
-def crt_fill_parameters(config_path, overwrite_flag=False, debug_flag=False):
+def crt_fill_parameters(config_path):
     """Calculate GSFLOW CRT Fill Parameters
 
-    Args:
-        config_file (str): Project config file path
-        ovewrite_flag (bool): if True, overwrite existing files
-        debug_flag (bool): if True, enable debug level logging
+    Parameters
+    ----------
+    config_path : str
+        Project configuration file (.ini) path.
 
-    Returns:
-        None
+    Returns
+    -------
+    None
+
     """
-
     # Initialize hru_parameters class
     hru = support.HRUParameters(config_path)
 
@@ -221,8 +223,9 @@ def crt_fill_parameters(config_path, overwrite_flag=False, debug_flag=False):
             update_c.updateRow(row)
 
     # Get list of segments and downstream cell for each stream/lake cell
-    # Downstream is calulated from flow direction
+    # Downstream is calculated from flow direction
     # Use IRUNBOUND instead of ISEG, since ISEG will be zeroed for lakes
+    # DEADBEEF - I don't think ISEG will be zero for lakes anymore
     logging.info('Cell out-flow dictionary')
     cell_dict = dict()
     fields = [
@@ -233,47 +236,69 @@ def crt_fill_parameters(config_path, overwrite_flag=False, debug_flag=False):
         # Skip inactive cells
         if int(row[0]) == 0:
             continue
-        # Skip non-lake and non-stream cells
-        if (int(row[1]) == 0 and int(row[2]) == 0):
+        # Skip non-stream and non-lake cells
+        elif (int(row[1]) == 0 and int(row[2]) == 0):
             continue
-        # Read in parameters
+
+        # ROW / COL
         cell = (int(row[7]), int(row[8]))
-        # support.next_row_col(FLOW_DIR, CELL)
-        # HRU_ID, ISEG,  NEXT_CELL, DEM_ADJ, X, X, X
+
+        # Read in parameters
+        # HRU_ID, ISEG, support.next_row_col(FLOW_DIR, CELL), DEM_ADJ, X, X, X
         cell_dict[cell] = [
             int(row[9]), int(row[4]), support.next_row_col(int(row[6]), cell),
             float(row[5]), 0, 0, 0]
-        del cell
+
     # Build list of unique segments
     iseg_list = sorted(list(set([v[1] for v in cell_dict.values()])))
+    print(iseg_list)
 
     # Calculate IREACH and OUTSEG
     logging.info('Calculate {} and {}'.format(
         hru.reach_field, hru.outseg_field))
     outseg_dict = dict()
-    for iseg in iseg_list:
-        # logging.debug('    Segment: {}'.format(iseg))
+    for iseg in sorted(iseg_list):
+        logging.debug('    Segment: {}'.format(iseg))
+
         # Subset of cell_dict for current iseg
-        iseg_dict = dict(
-            [(k, v) for k, v in cell_dict.items() if v[1] == iseg])
+        iseg_dict = dict([(k, v) for k, v in cell_dict.items() if v[1] == iseg])
+
         # List of all cells in current iseg
         iseg_cells = iseg_dict.keys()
+
         # List of out_cells for all cells in current iseg
         out_cells = [value[2] for value in iseg_dict.values()]
+
         # Every iseg will (should?) have one out_cell
-        out_cell = list(set(out_cells) - set(iseg_cells))[0]
-        # If not output cell, assume edge of domain
-        try:
-            outseg = cell_dict[out_cell][1]
-        except KeyError:
-            outseg = exit_seg
-        # Track sub-basin outseg
-        outseg_dict[iseg] = outseg
+        out_cell = list(set(out_cells) - set(iseg_cells))
+
+        # Process streams and lakes separately
+        # Streams
         if iseg > 0:
+            # If there is more than one out_cell
+            #   there is a problem with the stream network
+            if len(out_cell) != 1:
+                logging.error(
+                    '\nERROR: ISEG {} has more than one out put cell'
+                    '\n  Out cells: {}'
+                    '\n  Check for streams exiting then re-entering a lake'
+                    '\n  Lake cell elevations may not be constant\n'.format(
+                        iseg, out_cell))
+                sys.exit()
+
+            # If not output cell, assume edge of domain
+            try:
+                outseg = cell_dict[out_cell[0]][1]
+            except KeyError:
+                outseg = exit_seg
+
+            # Track sub-basin outseg
+            outseg_dict[iseg] = outseg
+
             # Calculate reach number for each cell
             reach_dict = dict()
             start_cell = list(set(iseg_cells) - set(out_cells))[0]
-            for i in xrange(len(out_cells)):
+            for i in range(len(out_cells)):
                 # logging.debug('    Reach: {}  Cell: {}'.format(i+1, start_cell))
                 reach_dict[start_cell] = i + 1
                 start_cell = iseg_dict[start_cell][2]
@@ -282,13 +307,43 @@ def crt_fill_parameters(config_path, overwrite_flag=False, debug_flag=False):
                 cell_dict[iseg_cell][4:] = [
                     outseg, reach_dict[iseg_cell], len(iseg_cells)]
             del reach_dict, start_cell
+        # Lakes
         else:
+            # For lake cells, there can be multiple outlets if all of them
+            #   are to inactive cells or out of the model
+            # Otherwise, like streams, there should only be one outcell per iseg
+            logging.debug('  Length: {}'.format(len(out_cells)))
+            if len(out_cell) == 1:
+                try:
+                    outseg = cell_dict[out_cell[0]][1]
+                except KeyError:
+                    outseg = exit_seg
+            elif (len(out_cell) != 1 and
+                  all(x[0] not in cell_dict.keys() for x in out_cell)):
+                outseg = exit_seg
+                logging.debug(
+                    '  All out cells are inactive, setting outseg '
+                    'to exit_seg {}'.format(exit_seg))
+            else:
+                logging.error(
+                    '\nERROR: ISEG {} has more than one out put cell'
+                    '\n  Out cells: {}'
+                    '\n  Check for streams exiting then re-entering a lake'
+                    '\n  Lake cell elevations may not be constant\n'.format(
+                        iseg, out_cell))
+                raw_input('ENTER')
+
+            # Track sub-basin outseg
+            outseg_dict[iseg] = outseg
+
             # For each lake segment cell, only save outseg
             # All lake cells are routed directly to the outseg
             for iseg_cell in iseg_cells:
                 cell_dict[iseg_cell][4:] = [outseg, 0, 0]
+            del outseg
+
         del iseg_dict, iseg_cells, iseg
-        del out_cells, out_cell, outseg
+        del out_cells, out_cell
 
     # Saving ireach and outseg
     logging.info('Save {} and {}'.format(hru.reach_field, hru.outseg_field))
@@ -428,8 +483,8 @@ def crt_fill_parameters(config_path, overwrite_flag=False, debug_flag=False):
     # with open(hru_type_ascii, 'r') as f: ascii_data = f.readlines()
     # f.close()
     # hru_casc_header = (
-    #    '{} {} {} {} {} {} {} {}     ' +
-    #    'HRUFLG STRMFLG FLOWFLG VISFLG ' +
+    #    '{} {} {} {} {} {} {} {}     '
+    #    'HRUFLG STRMFLG FLOWFLG VISFLG '
     #    'IPRN IFILL DPIT OUTITMAX\n').format(
     #        crt_hruflg, fill_strmflg, crt_flowflg, fill_visflg,
     #        crt_iprn, fill_ifill, crt_dpit, crt_outitmax)
@@ -497,7 +552,7 @@ def crt_fill_parameters(config_path, overwrite_flag=False, debug_flag=False):
             'DIFFERENCES BETWEEN FILLED AND UNFILLED LAND SURFACE MODELS')
     except ValueError:
         logging.error(
-            '\nERROR: CRT didn\'t completely run\n' +
+            '\nERROR: CRT didn\'t completely run\n'
             '  Check the CRT outputstat.txt file\n')
         sys.exit()
 
@@ -568,9 +623,6 @@ def arg_parse():
         '-i', '--ini', required=True,
         help='Project input file', metavar='PATH')
     parser.add_argument(
-        '-o', '--overwrite', default=False, action='store_true',
-        help='Force overwrite of existing files')
-    parser.add_argument(
         '-d', '--debug', default=logging.INFO, const=logging.DEBUG,
         help='Debug level logging', action='store_const', dest='loglevel')
     args = parser.parse_args()
@@ -578,6 +630,7 @@ def arg_parse():
     # Convert input file to an absolute path
     if os.path.isfile(os.path.abspath(args.ini)):
         args.ini = os.path.abspath(args.ini)
+
     return args
 
 
@@ -593,6 +646,4 @@ if __name__ == '__main__':
     logging.info(log_f.format('Script:', os.path.basename(sys.argv[0])))
 
     # Calculate CRT Fill Parameters
-    crt_fill_parameters(
-        config_path=args.ini, overwrite_flag=args.overwrite,
-        debug_flag=args.loglevel==logging.DEBUG)
+    crt_fill_parameters(config_path=args.ini)

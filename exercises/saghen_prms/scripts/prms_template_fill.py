@@ -1,7 +1,7 @@
 #--------------------------------
 # Name:         prms_template_fill.py
 # Purpose:      Fill PRMS Parameter File Template
-# Notes:        ArcGIS 10.2 Version
+# Notes:        ArcGIS 10.2+ Version
 # Python:       2.7
 #--------------------------------
 
@@ -19,18 +19,19 @@ import arcpy
 import support_functions as support
 
 
-def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
+def prms_template_fill(config_path):
     """Fill PRMS Parameter Template File
 
-    Args:
-        config_file (str): Project config file path
-        ovewrite_flag (bool): if True, overwrite existing files
-        debug_flag (bool): if True, enable debug level logging
+    Parameters
+    ----------
+    config_path : str
+        Project configuration file (.ini) path.
 
-    Returns:
-        None
+    Returns
+    -------
+    None
+
     """
-
     param_formats = {1: '{:d}', 2: '{:f}', 3: '{:f}', 4: '{}'}
 
     # Initialize hru_parameters class
@@ -97,6 +98,22 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
     else:
         elev_unit_scalar = 1.0
 
+    # Temperature calculation method
+    try:
+        temp_calc_method = inputs_cfg.get(
+            'INPUTS', 'temperature_calc_method').upper()
+    except:
+        temp_calc_method = '1STA'
+        logging.info('  Defaulting temperature_calc_method = {}'.format(
+            temp_calc_method))
+    temp_calc_options = ['ZONES', 'LAPSE', '1STA']
+    if temp_calc_method not in temp_calc_options:
+        logging.error(
+            '\nERROR: Invalid temperature calculation method ({})\n  '
+            'Valid methods are: {}'.format(
+                temp_calc_method, ', '.join(temp_calc_options)))
+        sys.exit()
+
     # Write parameter/dimensions to separate files based on "PARAM_FILE"
     #   value in prms_parameters.csv and prms_dimensions.csv
     try:
@@ -138,12 +155,11 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
 
     # Cascades
     crt_ws = os.path.join(parameter_ws, 'cascade_work')
+    gw_ws = os.path.join(parameter_ws, 'cascade_gw_work')
     crt_dimension_path = os.path.join(crt_ws, 'parameter_dimensions.txt')
     crt_parameter_path = os.path.join(crt_ws, 'cascade.param')
-    crt_gw_parameter_path = os.path.join(crt_ws, 'groundwater_cascade.param')
-    # fill_ws = os.path.join(parameter_ws, 'fill_work')
-    # crt_gw_parameter_path = os.path.join(
-    #     fill_ws, 'groundwater_cascade.param')
+    crt_gw_dimension_path = os.path.join(gw_ws, 'parameter_dimensions.txt')
+    crt_gw_parameter_path = os.path.join(gw_ws, 'groundwater_cascade.param')
 
     # Strings to search PRMS parameter file for
     # Newline character is required after title
@@ -172,6 +188,7 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
             '\nERROR: The parameters CSV file does not exist\n  {}'.format(
                 prms_param_csv_path))
         sys.exit()
+
     if not os.path.isdir(crt_ws):
         logging.error(
             '\nERROR: Cascades folder does not exist'
@@ -179,34 +196,42 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
             '\nERROR: Try re-running CRT using stream_parameters.py\n'.format(
                 crt_ws))
         sys.exit()
-    if not os.path.isfile(crt_dimension_path):
+    elif not os.path.isfile(crt_dimension_path):
         logging.error(
             '\nERROR: Cascades dimension file does not exist'
             '\nERROR:   {}'
             '\nERROR: Try re-running CRT using stream_parameters.py\n'.format(
                 crt_dimension_path))
         sys.exit()
-    if not os.path.isfile(crt_parameter_path):
+    elif not os.path.isfile(crt_parameter_path):
         logging.error(
             '\nERROR: Cascades parameter file does not exist'
             '\nERROR:   {}'
             '\nERROR: Try re-running CRT using stream_parameters.py\n'.format(
                 crt_parameter_path))
         sys.exit()
-    if not os.path.isfile(crt_gw_parameter_path):
+
+    if not os.path.isdir(gw_ws):
         logging.error(
-            '\nERROR: Groundwater cascades parameter file does not exist'
+            '\nERROR: Groundwater cascades folder does not exist'
             '\nERROR:   {}'
-            '\nERROR: Try re-running CRT using crt_fill_work.py\n'.format(
-                crt_gw_parameter_path))
+            '\nERROR: Try re-running CRT using stream_parameters.py\n'.format(
+                gw_ws))
         sys.exit()
-    # if not os.path.isfile(crt_gw_parameter_path):
-    #    logging.error(
-    #        '\nERROR: Groundwater cascades parameter file does not exist' +
-    #        '\nERROR:   {}' +
-    #        '\nERROR: Try re-running CRT using stream_parameters\n'.format(
-    #             crt_gw_parameter_path))
-    #    sys.exit()
+    elif not os.path.isfile(crt_gw_dimension_path):
+        logging.error(
+            '\nERROR: Groundwater cascades dimension file does not exist'
+            '\nERROR:   {}'
+            '\nERROR: Try re-running CRT using stream_parameters.py\n'.format(
+                crt_gw_dimension_path))
+        sys.exit()
+    elif not os.path.isfile(crt_gw_parameter_path):
+       logging.error(
+           '\nERROR: Groundwater cascades parameter file does not exist'
+           '\nERROR:   {}'
+           '\nERROR: Try re-running CRT using stream_parameters\n'.format(
+                crt_gw_parameter_path))
+       sys.exit()
 
 
     # Get number of cells in fishnet
@@ -277,7 +302,7 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
         value_fields = (hru.id_field, hru.lake_id_field)
         with arcpy.da.SearchCursor(hru.polygon_path, value_fields) as s_cursor:
             dimen_sizes['nlake'] = max(list(
-                [int(row[1]) for row in s_cursor if int(row[1]) > 0]))
+                [int(row[1]) for row in s_cursor if int(row[1]) >= 0]))
         logging.info('  nlakes = {}'.format(dimen_sizes['nlake']))
 
     # Getting number of lake cells
@@ -287,7 +312,7 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
         value_fields = (hru.id_field, hru.lake_id_field)
         with arcpy.da.SearchCursor(hru.polygon_path, value_fields) as s_cursor:
             dimen_sizes['nlake_hrus'] = len(list(
-                [int(row[1]) for row in s_cursor if int(row[1]) > 0]))
+                [int(row[1]) for row in s_cursor if int(row[1]) >= 0]))
         logging.info('  nlake cells = {}'.format(dimen_sizes['nlake_hrus']))
 
     # Getting number of stream cells
@@ -320,16 +345,42 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
                 [int(row[1]) for row in s_cursor if int(row[1]) > 0])))
         logging.info('  nsub = {}'.format(dimen_sizes['nsub']))
 
-    # Read in CRT dimensions
-    if (dimen_sizes['ncascade'].lower() == 'calculated' or
-            dimen_sizes['ncascdgw'].lower() == 'calculated'):
+    # Read in CRT cascade dimensions
+    if dimen_sizes['ncascade'].lower() == 'calculated':
         logging.info('\nReading CRT dimensions')
+        logging.debug('  {}'.format(crt_dimension_path))
         with open(crt_dimension_path, 'r') as input_f:
             crt_dimen_lines = [line.strip() for line in input_f.readlines()]
         input_f.close()
+        if not crt_dimen_lines:
+            logging.error('\nERROR: The CRT dimensions file is empty\n')
+            sys.exit()
         crt_dimen_break_i_list = [
             i for i, x in enumerate(crt_dimen_lines) if x == break_str]
         for i in crt_dimen_break_i_list:
+            if crt_dimen_lines[i + 1] not in ['ncascade']:
+                continue
+            logging.info('  {} = {}'.format(
+                crt_dimen_lines[i + 1], crt_dimen_lines[i + 2]))
+            dimen_sizes[crt_dimen_lines[i + 1]] = int(crt_dimen_lines[i + 2])
+        del crt_dimen_lines, crt_dimen_break_i_list
+
+    # Read in CRT groundwater cascade dimensions
+    if dimen_sizes['ncascdgw'].lower() == 'calculated':
+        logging.info('\nReading CRT groundwater cascade dimensions')
+        logging.debug('  {}'.format(crt_gw_dimension_path))
+        with open(crt_gw_dimension_path, 'r') as input_f:
+            crt_dimen_lines = [line.strip() for line in input_f.readlines()]
+        input_f.close()
+        if not crt_dimen_lines:
+            logging.error(
+                '\nERROR: The CRT groundwater dimensions file is empty\n')
+            sys.exit()
+        crt_dimen_break_i_list = [
+            i for i, x in enumerate(crt_dimen_lines) if x == break_str]
+        for i in crt_dimen_break_i_list:
+            if crt_dimen_lines[i + 1] not in ['ncascdgw']:
+                continue
             logging.info('  {} = {}'.format(
                 crt_dimen_lines[i + 1], crt_dimen_lines[i + 2]))
             dimen_sizes[crt_dimen_lines[i + 1]] = int(crt_dimen_lines[i + 2])
@@ -351,7 +402,6 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
                     '  Dimension set to "config_file" in {} but not found in '
                     'config file, exiting'.format(
                         os.path.basename(prms_dimen_csv_path)))
-
 
     # Link HRU fishnet field names to parameter names in '.param'
     param_names = dict()
@@ -453,9 +503,8 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
         dimen_count = str(len(dimen_names))
 
         # Calculate number of values
-        values_count = prod(
-            [int(dimen_sizes[dn]) for dn in dimen_names
-             if dimen_sizes[dn]])
+        values_count = prod([
+            int(dimen_sizes[dn]) for dn in dimen_names if dimen_sizes[dn]])
 
         # Write parameter to dictionaries
         param_names[param_name] = param_name
@@ -610,7 +659,79 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
             tmax_field, param_values['tmax_index'][i]))
         del tmax_values
 
-    #
+    logging.info('\nCalculating tmax_adj/tmin_adj')
+    param_names['tmax_adj'] = 'tmax_adj'
+    param_names['tmin_adj'] = 'tmin_adj'
+    param_types['tmax_adj'] = 2
+    param_types['tmin_adj'] = 2
+    if temp_calc_method in ['ZONES']:
+        param_dimen_counts['tmax_adj'] = 2
+        param_dimen_counts['tmin_adj'] = 2
+        param_dimen_names['tmax_adj'] = ['nhru', 'nmonths']
+        param_dimen_names['tmin_adj'] = ['nhru', 'nmonths']
+        param_value_counts['tmax_adj'] = 12 * fishnet_count
+        param_value_counts['tmin_adj'] = 12 * fishnet_count
+
+        # Read the Tmax/Tmin adjust values from the shapefile
+        # This could probably be simplified to a single search cursor pass
+        tmax_adj_values = []
+        tmin_adj_values = []
+        tmax_adj_field_list = ['TMX_ADJ_{:02d}'.format(m) for m in range(1, 13)]
+        tmin_adj_field_list = ['TMN_ADJ_{:02d}'.format(m) for m in range(1, 13)]
+        for i, tmax_adj_field in enumerate(tmax_adj_field_list):
+            tmax_adj_values.extend([
+                float(row[1]) for row in sorted(arcpy.da.SearchCursor(
+                    hru.polygon_path, (hru.id_field, tmax_adj_field)))])
+        for i, tmin_adj_field in enumerate(tmin_adj_field_list):
+            tmin_adj_values.extend([
+                float(row[1]) for row in sorted(arcpy.da.SearchCursor(
+                    hru.polygon_path, (hru.id_field, tmin_adj_field)))])
+        for i, value in enumerate(tmax_adj_values):
+            param_values['tmax_adj'][i] = value
+        for i, value in enumerate(tmin_adj_values):
+            param_values['tmin_adj'][i] = value
+        del tmax_adj_values, tmin_adj_values
+
+        # # This needs to be tested/compared with values from the above approach
+        # # Process the tmax/tmin values in one pass of the search cursor
+        # fields = [hru.id_field] + tmax_adj_field_list + tmin_adj_field_list
+        # with arcpy.da.SearchCursor(hru.polygon_path, fields) as search_c:
+        #     for r_i, row in enumerate(sorted(search_c)):
+        #         for f_i in range(12):
+        #             param_values['tmax_adj'][r_i * f_i] = float(row[f_i + 1])
+        #             param_values['tmin_adj'][r_i * f_i] = float(row[f_i + 13])
+        #         # for f_i in range(len(tmax_adj_field_list):
+
+        # Set/override hru_tsta using HRU_TSTA field
+        param_names['hru_tsta'] = 'hru_tsta'
+        param_dimen_counts['hru_tsta'] = 1
+        param_dimen_names['hru_tsta'] = ['nhru']
+        param_value_counts['hru_tsta'] = fishnet_count
+        param_types['hru_tsta'] = 1
+        fields = (hru.id_field, 'HRU_TSTA')
+        with arcpy.da.SearchCursor(hru.polygon_path, fields) as search_c:
+            for row_i, row in enumerate(sorted(search_c)):
+                param_values['hru_tsta'][row_i] = int(row[1])
+
+        # DEADBEEF - Do these parameters need to be set or overridden
+        # ntemp, elev_units, basin_tsta, hru_tlaps, tsta_elev
+
+    elif temp_calc_method in ['1STA', 'LAPSE']:
+        # Set the tmax_adj/tmin_adj dimensions
+        param_dimen_counts['tmax_adj'] = 1
+        param_dimen_counts['tmin_adj'] = 1
+        param_dimen_names['tmax_adj'] = ['nhru']
+        param_dimen_names['tmin_adj'] = ['nhru']
+        param_value_counts['tmax_adj'] = fishnet_count
+        param_value_counts['tmin_adj'] = fishnet_count
+
+        # Read the tmax_adj/tmin_adj parameter values from the shapefile
+        fields = (hru.id_field, 'TMAX_ADJ', 'TMIN_ADJ')
+        with arcpy.da.SearchCursor(hru.polygon_path, fields) as search_c:
+            for row_i, row in enumerate(sorted(search_c)):
+                param_values['tmax_adj'][row_i] = float(row[1])
+                param_values['tmin_adj'][row_i] = float(row[2])
+
     logging.info('\nCalculating rain_adj/snow_adj')
     ratio_field_list = ['PPT_RT_{:02d}'.format(m) for m in range(1, 13)]
     param_names['rain_adj'] = 'rain_adj'
@@ -635,7 +756,6 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
         param_values['snow_adj'][i] = value
     del ratio_values
 
-    #
     logging.info('\nCalculating subbasin_down')
     param_names['subbasin_down'] = 'subbasin_down'
     param_dimen_counts['subbasin_down'] = 1
@@ -643,7 +763,7 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
     param_value_counts['subbasin_down'] = dimen_sizes['nsub']
     param_types['subbasin_down'] = 1
     # Get list of subbasins and downstream cell for each stream/lake cell
-    # Downstream is calulated from flow direction
+    # Downstream is calculated from flow direction
     # logging.info('Cell out-flow dictionary')
     cell_dict = dict()
     fields = [
@@ -688,6 +808,17 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
             param_values['subbasin_down'][i]))
     del subbasin_list
 
+    # Switch SWALE points back to hru_type 1 or 2
+    logging.info('\nResetting SWALE point HRU_TYPE')
+    fields = [hru.type_field, hru.id_field, hru.lake_id_field]
+    for row in arcpy.da.SearchCursor(hru.polygon_path, fields):
+        # Skip inactive cells
+        if int(row[0]) != 3:
+            continue
+        elif int(row[2]) > 0:
+            param_values['hru_type'][row[1]] = 2
+        else:
+            param_values['hru_type'][row[1]] = 1
 
     # # DEADBEEF - lake_hru is not used in PRMS 3.0.X or gsflow
     # #   It is used in PRMS 4.0 though
@@ -705,7 +836,6 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
     # for i,lake_hru_id in enumerate(sorted(lake_hru_id_list)):
     #    # logging.debug('  {} {}'.format(i, lake_hru_id))
     #    param_values['lake_hru'][i] = lake_hru_id
-
 
     # Read in CRT parameters
     logging.info('\nReading CRT parameters')
@@ -788,44 +918,50 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
                     param_values[param_name][i] = crt_param_line[1]
     del crt_param_enumerate, crt_param_lines
 
-    # Add lake HRU's to groundwater cascades
-    logging.info('Modifying CRT groundwater parameters for all lake HRU\'s')
-    logging.info('  gw_up_id = HRU_ID (lake)')
-    logging.info('  gw_down_id = 0')
-    # logging.info('  gw_strmseg_down_id = OUTSEG')
-    logging.info('  gw_strmseg_down_id = 2')
-    logging.info('  gw_pct_up = 1')
-    field_list = [hru.type_field, hru.id_field, hru.outseg_field,
-                 hru.outflow_field]
-    lake_hru_id_dict = dict([
-       (row[1], row[2])
-       for row in arcpy.da.SearchCursor(hru.polygon_path, field_list)
-       if int(row[0]) == 2 and int(row[3]) == 0])
-    for lake_hru_id, outseg in sorted(lake_hru_id_dict.items()):
-       # if lake_hru_id == 9128:
-           # print lake_hru_id, outseg
-       # raw_input('ENTER')
-       i = dimen_sizes['ncascdgw']
-       dimen_sizes['ncascdgw'] += 1
-       param_values['gw_up_id'][i] = lake_hru_id
-       param_values['gw_down_id'][i] = 0
-       # DEADBEEF - PRMS didn't like when set to OUTSEG, but 2 worked?
-       # param_values['gw_strmseg_down_id'][i] = outseg
-       param_values['gw_strmseg_down_id'][i] = 2
-       # DEADBEEF - Trying 0
-       # param_values['gw_strmseg_down_id'][i] = 0
-       param_values['gw_pct_up'][i] = 1.00
-       # print param_values['gw_up_id'][i]
-       # print param_values['gw_down_id'][i]
-       # print param_values['gw_strmseg_down_id'][i]
-       # print param_values['gw_pct_up'][i]
-    param_value_counts['gw_up_id'] = int(dimen_sizes['ncascdgw'])
-    param_value_counts['gw_down_id'] = int(dimen_sizes['ncascdgw'])
-    param_value_counts['gw_strmseg_down_id'] = int(dimen_sizes['ncascdgw'])
-    param_value_counts['gw_pct_up'] = int(dimen_sizes['ncascdgw'])
-    logging.info('  ncascade = {}'.format(dimen_sizes['ncascade']))
-    logging.info('  ncascdgw = {}'.format(dimen_sizes['ncascdgw']))
-    # raw_input('ENTER')
+
+
+
+    # # Add lake HRU's to groundwater cascades
+    # logging.info('Modifying CRT groundwater parameters for all lake HRU\'s')
+    # logging.info('  gw_up_id = HRU_ID (lake)')
+    # logging.info('  gw_down_id = 0')
+    # # logging.info('  gw_strmseg_down_id = OUTSEG')
+    # logging.info('  gw_strmseg_down_id = 2')
+    # logging.info('  gw_pct_up = 1')
+    # field_list = [hru.type_field, hru.id_field, hru.outseg_field,
+    #              hru.outflow_field]
+    # lake_hru_id_dict = dict([
+    #    (row[1], row[2])
+    #    for row in arcpy.da.SearchCursor(hru.polygon_path, field_list)
+    #    if int(row[0]) == 2 and int(row[3]) == 0])
+    # for lake_hru_id, outseg in sorted(lake_hru_id_dict.items()):
+    #    # if lake_hru_id == 9128:
+    #        # print lake_hru_id, outseg
+    #    # raw_input('ENTER')
+    #    i = dimen_sizes['ncascdgw']
+    #    dimen_sizes['ncascdgw'] += 1
+    #    param_values['gw_up_id'][i] = lake_hru_id
+    #    param_values['gw_down_id'][i] = 0
+    #    # DEADBEEF - PRMS didn't like when set to OUTSEG, but 2 worked?
+    #    # param_values['gw_strmseg_down_id'][i] = outseg
+    #    param_values['gw_strmseg_down_id'][i] = 2
+    #    # DEADBEEF - Trying 0
+    #    # param_values['gw_strmseg_down_id'][i] = 0
+    #    param_values['gw_pct_up'][i] = 1.00
+    #    # print param_values['gw_up_id'][i]
+    #    # print param_values['gw_down_id'][i]
+    #    # print param_values['gw_strmseg_down_id'][i]
+    #    # print param_values['gw_pct_up'][i]
+    # param_value_counts['gw_up_id'] = int(dimen_sizes['ncascdgw'])
+    # param_value_counts['gw_down_id'] = int(dimen_sizes['ncascdgw'])
+    # param_value_counts['gw_strmseg_down_id'] = int(dimen_sizes['ncascdgw'])
+    # param_value_counts['gw_pct_up'] = int(dimen_sizes['ncascdgw'])
+    # logging.info('  ncascade = {}'.format(dimen_sizes['ncascade']))
+    # logging.info('  ncascdgw = {}'.format(dimen_sizes['ncascdgw']))
+    # # raw_input('ENTER')
+
+
+
 
 
     # DEADBEEF
@@ -879,7 +1015,8 @@ def prms_template_fill(config_path, overwrite_flag=False, debug_flag=False):
                     continue
                 if (type(dimen_size) is str and
                         dimen_size.lower() in ['calculated']):
-                    logging.debug('    Dimension {} not calculated'.format())
+                    logging.debug(
+                        '    Dimension {} not calculated'.format(dimen_size))
                     continue
                 logging.debug('    {}'.format(dimen_name))
                 output_f.write(break_str + '\n')
@@ -978,9 +1115,6 @@ def arg_parse():
         '-i', '--ini', required=True,
         help='Project input file', metavar='PATH')
     parser.add_argument(
-        '-o', '--overwrite', default=False, action='store_true',
-        help='Force overwrite of existing files')
-    parser.add_argument(
         '-d', '--debug', default=logging.INFO, const=logging.DEBUG,
         help='Debug level logging', action='store_const', dest='loglevel')
     args = parser.parse_args()
@@ -988,6 +1122,7 @@ def arg_parse():
     # Convert input file to an absolute path
     if os.path.isfile(os.path.abspath(args.ini)):
         args.ini = os.path.abspath(args.ini)
+
     return args
 
 
@@ -1003,6 +1138,4 @@ if __name__ == '__main__':
     logging.info(log_f.format('Script:', os.path.basename(sys.argv[0])))
 
     # Fill PRMS Parameter Template File
-    prms_template_fill(
-        config_path=args.ini, overwrite_flag=args.overwrite,
-        debug_flag=args.loglevel==logging.DEBUG)
+    prms_template_fill(config_path=args.ini)

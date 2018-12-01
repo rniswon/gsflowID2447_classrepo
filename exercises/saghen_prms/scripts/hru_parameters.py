@@ -1,7 +1,7 @@
 #--------------------------------
 # Name:         hru_parameters.py
 # Purpose:      GSFLOW HRU parameters
-# Notes:        ArcGIS 10.2 Version
+# Notes:        ArcGIS 10.2+ Version
 # Python:       2.7
 #--------------------------------
 
@@ -18,18 +18,19 @@ from arcpy import env
 import support_functions as support
 
 
-def hru_parameters(config_path, overwrite_flag=False, debug_flag=False):
+def hru_parameters(config_path):
     """Calculate GSFLOW HRU Parameters
 
-    Args:
-        config_file (str): Project config file path
-        ovewrite_flag (bool): if True, overwrite existing files
-        debug_flag (bool): if True, enable debug level logging
+    Parameters
+    ----------
+    config_path : str
+        Project configuration file (.ini) path.
 
-    Returns:
-        None
+    Returns
+    -------
+    None
+
     """
-
     # Initialize hru parameters class
     hru = support.HRUParameters(config_path)
 
@@ -303,10 +304,14 @@ def hru_parameters(config_path, overwrite_flag=False, debug_flag=False):
     # Sink field
     support.add_field_func(hru.polygon_path, hru.hru_sink_field, 'LONG')
 
-    # PPT Zone fields
-    # if set_ppt_zones_flag:
+    # Precipitation zone fields
     support.add_field_func(hru.polygon_path, hru.ppt_zone_id_field, 'SHORT')
     support.add_field_func(hru.polygon_path, hru.hru_psta_field, 'SHORT')
+
+    # Temperature zone fields
+    # if temp_calc_method in ['ZONE', 'LAPSE']:
+    # support.add_field_func(hru.polygon_path, hru.temp_zone_id_field, 'SHORT')
+    # support.add_field_func(hru.polygon_path, hru.hru_tsta_field, 'SHORT')
 
     # DEM based
     support.add_field_func(hru.polygon_path, hru.jh_tmax_field, 'DOUBLE')
@@ -355,12 +360,23 @@ def hru_parameters(config_path, overwrite_flag=False, debug_flag=False):
             support.add_field_func(
                 hru.polygon_path,
                 '{}_{}'.format(prism_data_name, month), 'DOUBLE')
-    # PRISM mean monthly PPT ratio fields
+    # PRISM mean monthly precipitation ratio fields
     for month in month_list:
         if month == '14':
             continue
         support.add_field_func(
             hru.polygon_path, 'PPT_RT_{}'.format(month), 'DOUBLE')
+    # Temperature adjust fields are added in temp_adjust_parameters.py if needed
+    # for month in month_list:
+    #     if month == '14':
+    #         continue
+    #     support.add_field_func(
+    #         hru.polygon_path, 'TMX_ADJ_{}'.format(month), 'DOUBLE')
+    # for month in month_list:
+    #     if month == '14':
+    #         continue
+    #     support.add_field_func(
+    #         hru.polygon_path, 'TMN_ADJ_{}'.format(month), 'DOUBLE')
 
     # Id field is added by default to new fishnets
     if arcpy.ListFields(hru.polygon_path, 'Id'):
@@ -525,8 +541,7 @@ def hru_parameters(config_path, overwrite_flag=False, debug_flag=False):
         logging.error('\nERROR: Unsupported model point type(s) found, exiting')
         logging.error('\n  Model point types: {}\n'.format(model_point_types))
         sys.exit()
-    elif 'OUTLET' not in model_point_types and 'SWALE' not in model_point_types:
-    #elif not set(model_point_types).issubset(set(['OUTLET', 'SWALE'])):
+    elif not set(model_point_types).intersection(set(['OUTLET', 'SWALE'])):
         logging.error(
             '\nERROR: At least one model point must be an OUTLET or SWALE, '
             'exiting\n')
@@ -612,9 +627,6 @@ def arg_parse():
         '-i', '--ini', required=True,
         help='Project input file', metavar='PATH')
     parser.add_argument(
-        '-o', '--overwrite', default=False, action='store_true',
-        help='Force overwrite of existing files')
-    parser.add_argument(
         '-d', '--debug', default=logging.INFO, const=logging.DEBUG,
         help='Debug level logging', action='store_const', dest='loglevel')
     args = parser.parse_args()
@@ -637,6 +649,4 @@ if __name__ == '__main__':
     logging.info(log_f.format('Script:', os.path.basename(sys.argv[0])))
 
     # Calculate GSFLOW HRU Parameters
-    hru_parameters(
-        config_path=args.ini, overwrite_flag=args.overwrite,
-        debug_flag=args.loglevel==logging.DEBUG)
+    hru_parameters(config_path=args.ini)
