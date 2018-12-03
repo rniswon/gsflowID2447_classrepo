@@ -413,7 +413,8 @@ def temp_adjust_parameters(config_path):
     elif temp_calc_method == '1STA':
         # Set all cells to zone 1
         arcpy.CalculateField_management(
-            hru.polygon_path, hru.temp_zone_id_field, 1, 'PYTHON')
+            hru.polygon_path, hru.hru_tsta_field, 1, 'PYTHON')
+    
 
     # Calculate adjustments
     logging.info('\nCalculating mean monthly temperature adjustments')
