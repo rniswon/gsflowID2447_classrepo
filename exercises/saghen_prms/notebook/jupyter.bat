@@ -1,1 +1,0 @@
-C:\Users\rsregan\AppData\Local\Continuum\Anaconda3\Scripts\jupyter-notebook.exe
