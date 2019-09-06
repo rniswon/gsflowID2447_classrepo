@@ -69,7 +69,7 @@ def fishnet_func(config_path, overwrite_flag=False):
     if arcpy.Exists(hru.polygon_path) and not overwrite_flag:
         logging.warning('\nWARNING: The existing fishnet/grid will be '
                         'over written\n  {}'.format(hru.polygon_path))
-        raw_input('Press ENTER to continue')
+        #raw_input('Press ENTER to continue')
 
     # Check input paths
     study_area_path = inputs_cfg.get('INPUTS', 'study_area_path')

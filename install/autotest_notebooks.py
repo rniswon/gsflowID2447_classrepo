@@ -54,11 +54,13 @@ def test_notebooks():
 
 
 if __name__ == '__main__':
-    
-    for dpth in [nbdir]:
-        # get list of notebooks to run
-        files = get_Notebooks(dpth)
+    jnbs = ['0_model_boundary.ipynb', '1_fishnet_params.ipynb', '2_dem_parameters.ipynb',
+            '3_dem_2_streams_parameters.ipynb',
+     '4_crt_fill_parameters.ipynb', '5_stream_parameters.ipynb', '6_veg_parameters.ipynb',
+     '7_soil_parameters.ipynb', '8_climate_parameters.ipynb', '9_impervious_parameters.ipynb',
+            'climate_zones.ipynb', 'Config_modify.ipynb']
 
-        # run each notebook
-        for fn in files:
-            run_notebook(dpth, fn)
+    for fn in jnbs:
+        dpth = r"..\\exercises\\saghen_prms\\notebook"
+        run_notebook(dpth, fn)
+
