@@ -22,7 +22,7 @@ fidw.close()
 
 
 if 1:
-    print("------------- Create a new environment from yalm file ---------------")
+    print("------------- Create a new environment from yml file ---------------")
     os.system("conda env create -f environment_class.yml")
 
 # get conda info
@@ -63,6 +63,7 @@ if not (env_path is None):
         os.system('git clone https://github.com/modflowpy/flopy.git')
 
     # pygsflow
+    print("--------- Install pygsflow.....")
     lists = os.listdir(pkg_folder)
     if 'pygsflow' in lists:
         pass
