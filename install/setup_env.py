@@ -79,7 +79,7 @@ if not (env_path is None):
     fidw.close()
     os.chdir(base_folder)
 	
-	print("--------- Connect with arcpy.....")
+    print("--------- Connect with arcpy.....")
     site_pkg = env_path + r"\Lib\site-packages\arcpy.pth"
     copyfile('arcpy.pth', site_pkg)
 
