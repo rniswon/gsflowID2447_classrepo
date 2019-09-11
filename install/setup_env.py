@@ -63,7 +63,7 @@ if not (env_path is None):
         os.system('git clone https://github.com/modflowpy/flopy.git')
 
     # pygsflow
-	print("--------- Install pyGSFLOW.....")
+    print("--------- Install pyGSFLOW.....")
     lists = os.listdir(pkg_folder)
     if 'pygsflow' in lists:
         pass
