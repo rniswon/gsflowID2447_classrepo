@@ -37,7 +37,11 @@ def run_notebook(dpth, fn):
           '--output-dir ' + '{} '.format(testdir) + \
           '--output ' + '{}'.format(fn)
     ival = os.system(cmd)
-    assert ival == 0, 'could not run {}'.format(fn)
+    try:
+        assert ival == 0, 'could not run {}'.format(fn)
+        print("{}...............ok.".format(fn))
+    except:
+        print("{}...............Failed.".format(fn))
 
 
 def test_notebooks():
