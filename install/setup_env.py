@@ -63,6 +63,7 @@ if not (env_path is None):
         os.system('git clone https://github.com/modflowpy/flopy.git')
 
     # pygsflow
+	print("--------- Install pyGSFLOW.....")
     lists = os.listdir(pkg_folder)
     if 'pygsflow' in lists:
         pass
@@ -77,7 +78,8 @@ if not (env_path is None):
         fidw.write("\n")
     fidw.close()
     os.chdir(base_folder)
-
+	
+	print("--------- Connect with arcpy.....")
     site_pkg = env_path + r"\Lib\site-packages\arcpy.pth"
     copyfile('arcpy.pth', site_pkg)
 
