@@ -63,8 +63,23 @@ if __name__ == '__main__':
      '4_crt_fill_parameters.ipynb', '5_stream_parameters.ipynb', '6_veg_parameters.ipynb',
      '7_soil_parameters.ipynb', '8_climate_parameters.ipynb', '9_impervious_parameters.ipynb',
             'climate_zones.ipynb', 'Config_modify.ipynb']
+    if 1:
+        print("Testing PRMS arcpy notebooks......")
+        for fn in jnbs:
+            dpth = r"..\\exercises\\saghen_prms\\notebook"
+            run_notebook(dpth, fn)
+    if 1:
+        print("Testing Modflow notebook......")
+        jnbs = ['Groundwater_modeling_intro.ipynb']
+        for fn in jnbs:
+            dpth = r"..\\exercises\\saghen_modflow"
+            run_notebook(dpth, fn)
 
+    print("Testing pyGsflow notebook......")
+    jnbs = ['1_pygsflow_intro.ipynb', '2_Assemble_GSFLOW_model.ipynb', '3_Model_Sensitivity_Calibration.ipynb']
     for fn in jnbs:
-        dpth = r"..\\exercises\\saghen_prms\\notebook"
+        dpth = r"..\\exercises\\\saghen_pyGSFLOW"
         run_notebook(dpth, fn)
+
+
 

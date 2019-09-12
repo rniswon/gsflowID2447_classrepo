@@ -2,6 +2,8 @@ tests/
 python_packages/
 .idea/
 .github/
+exercises/saghen_modflow/modflow/
+exercises/saghen_modflow/modflow/saghen.UZF.cbc 
 exercises/models_data/gis/hru_params.cpg
 exercises/models_data/gis/hru_params.dbf
 exercises/models_data/gis/hru_params.kst
