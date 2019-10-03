@@ -1,29 +1,33 @@
 import sys, os
 from shutil import copyfile
 
+
 Env_name = sys.argv[1]
 pths_to_add = []
+if 0:
 
-#
-fidr = open("environment32.yml", 'r')
-contents = fidr.readlines()
-fidr.close()
+    #
+    fidr = open("environment32.yml", 'r')
+    contents = fidr.readlines()
+    fidr.close()
 
-# write env file
-fidw = open("environment_class.yml", 'w')
-for line in contents:
-    if 'name' in line:
-        fidw.write('name: {}'.format(Env_name))
-        fidw.write('\n')
-    else:
-        fidw.write(line)
+    # write env file
+    fidw = open("environment_class.yml", 'w')
+    for line in contents:
+        if 'name' in line:
+            fidw.write('name: {}'.format(Env_name))
+            fidw.write('\n')
+        else:
+            fidw.write(line)
 
-fidw.close()
+    fidw.close()
 
 
-if 1:
+
     print("------------- Create a new environment from yalm file ---------------")
-    os.system("conda env create -f environment_class.yml")
+    #os.system('set CONDA_FORCE_32BIT=1')
+    print("------------- 32 bit installation -----------------------------------")
+    os.system("set CONDA_FORCE_32BIT=1 & conda env create -f environment_class.yml")
 
 # get conda info
 conda_info = os.popen('conda info --envs').read()
@@ -80,8 +84,8 @@ if not (env_path is None):
     os.chdir(base_folder)
 	
     print("--------- Connect with arcpy.....")
-    site_pkg = env_path + r"\Lib\site-packages\arcpy.pth"
-    copyfile('arcpy.pth', site_pkg)
+    site_pkg = env_path + r"\Lib\site-packages\arcpy32.pth"
+    copyfile('arcpy32.pth', site_pkg)
 
 
 
