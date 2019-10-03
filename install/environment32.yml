@@ -1,4 +1,4 @@
-name: gsflow32_2
+name: gsflow
 channels:
   - conda-forge/label/gcc7
   - anaconda
