@@ -27,7 +27,7 @@
 # ### MODFLOW PACKAGES
 #  <img src=".\figures\mf_packages.png">
 
-# In[12]:
+# In[1]:
 
 
 import os
@@ -42,21 +42,21 @@ import datetime
 # ### Explore HRU Shapefile Using Geopandas
 # Let us upload the hru_param.shp file and look at it.
 
-# In[13]:
+# In[2]:
 
 
 hru_shp_file = r"../models_data/gis/hru_params.shp"
 hru_shp = gpd.read_file(hru_shp_file)
 
 
-# In[14]:
+# In[3]:
 
 
 #Let us look at the attribute table and plot some information ....
 hru_shp.head(5) # list the first 5 rows
 
 
-# In[15]:
+# In[4]:
 
 
 # Two ways to access data in Geopandas
@@ -64,7 +64,7 @@ hru_shp.HRU_TYPE
 hru_shp['HRU_TYPE']
 
 
-# In[16]:
+# In[5]:
 
 
 # We can plot any field in the attribute table
@@ -72,14 +72,14 @@ hru_shp.plot(column='HRU_TYPE',  figsize=(12, 12))
 plt.title("Active Domain")
 
 
-# In[17]:
+# In[6]:
 
 
 ## access other values in hru shapefile
 print(hru_shp.columns)
 
 
-# In[18]:
+# In[7]:
 
 
 # sort attribute table data so that the HRU_ID sorted as 1,2,3,...
@@ -90,7 +90,7 @@ hru_shp.head(5)
 # ### FLOPY
 # 
 
-# In[19]:
+# In[8]:
 
 
 # Generate an empty flopy object. 
@@ -107,7 +107,7 @@ print(mf)
 # * Discretize the domain using the grid used for HRU
 #  <img src=".\figures\dis.png">
 
-# In[20]:
+# In[9]:
 
 
 # Define the grid -- Space descritization
@@ -118,7 +118,7 @@ del_c = 90.0
 print(n_col, n_row)
 
 
-# In[21]:
+# In[10]:
 
 
 # The domain groundwater model is a 3D, so we need to specify the 
@@ -130,7 +130,7 @@ thk2 =  np.loadtxt(r"../models_data/misc/thickness2.txt")           # thickness 
 plt.imshow(thk2); plt.colorbar()
 
 
-# In[22]:
+# In[11]:
 
 
 # Layers elevation
@@ -154,7 +154,7 @@ plt.imshow(btm2, cmap = 'jet'); plt.colorbar(fraction=0.046, pad=0.04);  plt.tit
 # ### Discretization of Simulation Period
 # <img src = ".\figures\StressPeriod.png">
 
-# In[23]:
+# In[12]:
 
 
 # Simulation period & time steps -- -- Temporal discretization
@@ -186,7 +186,7 @@ mf
 # #### MODFLOW online help 
 # https://water.usgs.gov/ogw/modflow/MODFLOW-2005-Guide/
 
-# In[24]:
+# In[13]:
 
 
 #dis.botm.array
@@ -204,7 +204,7 @@ dis.plot()
 # 
 # <img src=".\figures\cell_types.png">
 
-# In[25]:
+# In[14]:
 
 
 ## Read HRU_TYPE from hru shape file and reshape it into 2D domain
@@ -213,7 +213,7 @@ ibound2d = hru_shp["HRU_TYPE"].values.reshape(n_row, n_col)
 plt.imshow(ibound2d)
 
 
-# In[26]:
+# In[15]:
 
 
 ## Constant Head
@@ -223,7 +223,7 @@ ibound2d[const_head_rows, const_head_cols] = -1
 plt.imshow(ibound2d)
 
 
-# In[27]:
+# In[16]:
 
 
 ## HRU shapefile has a 2D map of the inactive zones, so we need to define the active domain for the 3D groundwater domain.
@@ -235,7 +235,7 @@ for lay in range(nlayrs):
 ibound3d.shape
 
 
-# In[28]:
+# In[17]:
 
 
 ## initial head
@@ -258,7 +258,7 @@ bas.plot()
 
 
 
-# In[29]:
+# In[18]:
 
 
 # Check packages that are assigned so far...
@@ -267,7 +267,7 @@ mf.get_package_list()
 
 # ## Ploting the Grid ....
 
-# In[30]:
+# In[19]:
 
 
 fig = plt.figure(figsize=(8, 8))
@@ -278,7 +278,7 @@ linecollection = modelmap.plot_grid()
 
 
 
-# In[31]:
+# In[20]:
 
 
 # cross section
@@ -316,7 +316,7 @@ t = ax.set_title('Row {}'.format(row_num))
 
 
 
-# In[32]:
+# In[21]:
 
 
 laytyp = np.ones(nlayrs)  # convertable layer
@@ -348,7 +348,7 @@ upw = flopy.modflow.mfupw.ModflowUpw(mf, laytyp=laytyp, layavg=avg_typ, chani=h_
 ## Can you Check UPW package? 
 
 
-# In[33]:
+# In[22]:
 
 
 plt.imshow(sy[1,:,:]<=0.01)
@@ -366,7 +366,7 @@ plt.imshow(sy[1,:,:]<=0.01)
 # 
 # 
 
-# In[34]:
+# In[23]:
 
 
 # The stream data can be extracted from the hru shapefile by masking out all cells that has ISEG value equel to 0.
@@ -387,7 +387,7 @@ plt.title("Simulated stream network")
 # * streamd hydraulic conductivity,
 # * properties of the unsaturated zone. 
 
-# In[35]:
+# In[24]:
 
 
 ## Reach Data
@@ -435,7 +435,7 @@ reach_data.head(10)
 # 
 # <img src = ".\figures\sfr3.png">
 
-# In[36]:
+# In[25]:
 
 
 seg_data_labels = ['nseg', 'icalc', 'outseg', 'iupseg', 'iprior',
@@ -450,7 +450,7 @@ unique_segments = unique_segments.sort_values(by='ISEG')
 unique_segments
 
 
-# In[37]:
+# In[26]:
 
 
 n_segments =  len(unique_segments)
@@ -470,7 +470,7 @@ segment_data['roughch'] = 0.04                              # Roughness Coeffcie
 segment_data
 
 
-# In[38]:
+# In[27]:
 
 
 ## Can you think of another way to compute the widths if you have no data? 
@@ -492,7 +492,7 @@ if False:
 
 # ### SFR2 General Options
 
-# In[39]:
+# In[28]:
 
 
 ## This the options in the first line in the SFR package
@@ -526,7 +526,7 @@ segment_data = segment_data.sort_values(by=['nseg'])
 reach_data.head(5)
 
 
-# In[40]:
+# In[29]:
 
 
 reach_data = reach_data.to_records(index=False)
@@ -549,7 +549,7 @@ sfr = flopy.modflow.ModflowSfr2(mf, nstrm=n_reaches, nss=n_segments, const=const
 mf.get_package_list()
 
 
-# In[41]:
+# In[30]:
 
 
 sfr.plot()
@@ -558,7 +558,7 @@ sfr.plot()
 # ### Output Control Package
 # This is where we tell MODFLOW how to print results output. It is wise to print the results only at the time you are interseted in. 
 
-# In[42]:
+# In[31]:
 
 
 # Add OC package to the MODFLOW model
@@ -579,7 +579,7 @@ for time_point in steps_to_print:
 spd
 
 
-# In[43]:
+# In[32]:
 
 
 oc = flopy.modflow.ModflowOc(mf, stress_period_data=spd, cboufm='(20i5)')
@@ -595,7 +595,7 @@ mf.get_package_list()
 # ### Unsaturated Zone Flow (UZF) Package
 # The Unsarurated Zone (USZ) plays a major role in underatanding the interaction between deep groundwater system ans surface water system. 
 
-# In[44]:
+# In[33]:
 
 
 nuztop =  3         # Recharge to and discharge from the top model layer
@@ -616,7 +616,7 @@ plt.figure(figsize=(10,10))
 plt.imshow(irunbnd)
 
 
-# In[45]:
+# In[34]:
 
 
 finf = np.loadtxt(r"../models_data/misc/uzf_finf.txt")
@@ -635,14 +635,14 @@ annual_rain = 0.20 *  (annual_rain/ 365.25)/1000.0   # convert units from mm/yea
 
 
 
-# In[46]:
+# In[35]:
 
 
 #uzf.plot()
 plt.imshow(annual_rain.reshape(n_row, n_col)); plt.colorbar()
 
 
-# In[47]:
+# In[36]:
 
 
 thts = np.loadtxt(r"../models_data/misc//uzf_ths.txt") # porosity of the unsaturated zone
@@ -656,13 +656,13 @@ uzf = flopy.modflow.ModflowUzf1(mf, nuztop=nuztop, iuzfopt=iuzfopt, irunflg=irun
                                 finf=finf)
 
 
-# In[48]:
+# In[37]:
 
 
 #uzf.write_file()
 
 
-# In[49]:
+# In[38]:
 
 
 mf.get_package_list()
@@ -670,7 +670,7 @@ mf.get_package_list()
 
 # ### NWT Solver
 
-# In[50]:
+# In[39]:
 
 
 flopy.modflow.mfnwt.ModflowNwt.load(r"../models_data/misc/solver_options.nwt", mf)
@@ -684,19 +684,19 @@ if False:
                                            extension='nwt', unitnumber=None, filenames=None)
 
 
-# In[51]:
+# In[40]:
 
 
 mf.get_package_list()
 
 
-# In[52]:
+# In[41]:
 
 
 mf.write_input()
 
 
-# In[53]:
+# In[42]:
 
 
 mf.run_model()
@@ -705,7 +705,7 @@ mf.run_model()
 # ### Learn more About Flopy !!
 # https://github.com/modflowpy/flopy/tree/develop/examples/Notebooks
 
-# In[54]:
+# In[43]:
 
 
 get_ipython().system(u'jupyter nbconvert --to script Groundwater_modeling_intro.ipynb')
