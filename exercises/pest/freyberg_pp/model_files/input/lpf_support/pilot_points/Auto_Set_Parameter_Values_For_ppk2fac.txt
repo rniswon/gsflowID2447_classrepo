@@ -1,0 +1,17 @@
+.\freyberg.spec      
+..\Lay_1_K_PP_List.txt     
+0.0    
+.\Lay1_Zone_Arr.txt     
+f      
+.\Struct_File.HydKh_L_1.Variogram.txt     
+                                                                                 . 
+HydKh_L_1     
+o    
+1500.0   
+1    
+8    
+..\freyberg_interp_factors.txt    
+f    
+t.OUTPUT_sd.ref.txt    
+f    
+t.OUTPUT_reg.txt   

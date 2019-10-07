@@ -1,0 +1,76 @@
+ 
+ Program PPK2FAC calculates point-to-cell factors by which kriging is 
+   undertaken from a set of pilot points to the finite-difference grid.
+ 
+ Enter name of grid specification file:  Error: cannot open file .\freyberg.spc - try again.
+ Enter name of grid specification file:  Error: cannot open file ..\Lay_1_K_PP_List.txt - try again.
+ Enter name of grid specification file:  Error: cannot open file 0.0 - try again.
+ Enter name of grid specification file:  Error: cannot open file .\Lay_1_Zone_Arr.txt - try again.
+ Enter name of grid specification file:  Error: cannot open file f - try again.
+ Enter name of grid specification file: 
+ Error: cannot read grid dimensions from line 1 of file 
+   .\Struct_File.HydKh_L_1.Variogram.txt.
+ 
+ Program PPK2FAC calculates point-to-cell factors by which kriging is 
+   undertaken from a set of pilot points to the finite-difference grid.
+ 
+ Enter name of grid specification file:   - grid specifications read from file .\freyberg.spec
+ Enter name of pilot points file:   - data for 70 pilot points read from pilot points file 
+    ..\Lay_1_K_PP_List.txt
+ 
+ Enter minimum allowable points separation: 
+ Enter name of zonal integer array file:  Is this a formatted or unformatted file? [f/u]:   - integer array read from file .\Lay1_Zone_Arr.txt
+ Enter name of structure file: 
+ The following zones have been detected in the integer array:-
+ 
+    For zone characterised by integer value of 1:- 
+    Enter structure name (blank if no interpolation for this zone): 
+ Interpolation must take place for at least one zone in integer array - try 
+   again.
+ 
+ 
+ The following zones have been detected in the integer array:-
+ 
+    For zone characterised by integer value of 1:- 
+    Enter structure name (blank if no interpolation for this zone):     Perform simple or ordinary kriging [s/o]:     Enter search radius:     Enter minimum number of pilot points to use for interpolation:     Enter maximum number of pilot points to use for interpolation: 
+ Enter name for interpolation factor file:  Is this a formatted or unformatted file? [f/u]:  Enter name for output standard deviation array file:  Write a formatted or unformatted file? [f/u]:  Enter name for regularisation information file: 
+ Carrying out interpolation for integer array zone 1....
+ 
+   Number of pilot points for this zone     =    70
+   Mean data value for these pilot points   =   8.0011    
+   Data standard deviation for these points =  9.49328E-03
+   Working....
+   No. of grid points for which factors were calculated =   800
+ 
+  - kriging factors written to file ..\freyberg_interp_factors.txt
+  - formatted real array written to file t.OUTPUT_sd.ref.txt
+  - regularisation information written to file t.OUTPUT_reg.txt
+ 
+ Program PPK2FAC calculates point-to-cell factors by which kriging is 
+   undertaken from a set of pilot points to the finite-difference grid.
+ 
+ Enter name of grid specification file:   - grid specifications read from file .\freyberg.spec
+ Enter name of pilot points file:   - data for 70 pilot points read from pilot points file 
+    ..\Lay_1_K_PP_List.txt
+ 
+ Enter minimum allowable points separation: 
+ Enter name of zonal integer array file:  Is this a formatted or unformatted file? [f/u]:   - integer array read from file .\Lay1_Zone_Arr.txt
+ Enter name of structure file: 
+ The following zones have been detected in the integer array:-
+ 
+    For zone characterised by integer value of 0:- 
+    Enter structure name (blank if no interpolation for this zone): 
+    For zone characterised by integer value of 1:- 
+    Enter structure name (blank if no interpolation for this zone):     Perform simple or ordinary kriging [s/o]:     Enter search radius:     Enter minimum number of pilot points to use for interpolation:     Enter maximum number of pilot points to use for interpolation: 
+ Enter name for interpolation factor file:  Is this a formatted or unformatted file? [f/u]:  Enter name for output standard deviation array file:  Write a formatted or unformatted file? [f/u]:  Enter name for regularisation information file: 
+ Carrying out interpolation for integer array zone 1....
+ 
+   Number of pilot points for this zone     =    70
+   Mean data value for these pilot points   =   8.0011    
+   Data standard deviation for these points =  9.49328E-03
+   Working....
+   No. of grid points for which factors were calculated =   705
+ 
+  - kriging factors written to file ..\freyberg_interp_factors.txt
+  - formatted real array written to file t.OUTPUT_sd.ref.txt
+  - regularisation information written to file t.OUTPUT_reg.txt
