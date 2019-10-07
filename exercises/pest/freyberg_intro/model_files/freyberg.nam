@@ -6,7 +6,6 @@ LIST           2 freyberg.list
 #
 # Model Input
 #
-HYD           36 ./input/freyberg.hyd
 DIS           11 ./input/freyberg.dis
 LPF           31 ./input/freyberg.lpf
 PCG           32 ./input/freyberg.pcg
