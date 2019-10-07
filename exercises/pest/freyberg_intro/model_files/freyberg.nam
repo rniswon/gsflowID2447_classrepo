@@ -13,13 +13,16 @@ PCG           32 ./input/freyberg.pcg
 BAS6          13 ./input/freyberg.bas 
 RCH           19 ./input/freyberg.rch 
 WEL           20 ./input/freyberg.wel 
-RIV           18 ./input/freyberg.riv 
+#RIV           18 ./input/freyberg.riv 
+SFR           41 ./input/freyberg.sfr
 OC            14 ./input/freyberg.oc 
 HOB           15 ./input/freyberg.hob
+GAGE          16 ./input/freyberg.gag
 #
 # Model Output
 #
 DATA          42 ./output/freyberg.hobs
+DATA         201 ./output/freyberg.sfrout
 DATA(BINARY)  51 ./output/freyberg.hds      REPLACE
 DATA(BINARY)  52 ./output/freyberg.ddn      REPLACE
 DATA(BINARY)  53 ./output/freyberg.cbc      REPLACE
