@@ -12,6 +12,6 @@ o
 8    
 ..\freyberg_interp_factors.txt    
 f    
-t.OUTPUT_sd.ref.txt    
+sd.ref.txt    
 f    
-t.OUTPUT_reg.txt   
+reg.ref.txt   

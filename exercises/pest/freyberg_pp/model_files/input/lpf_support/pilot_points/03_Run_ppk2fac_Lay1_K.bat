@@ -52,11 +52,11 @@ echo %5    >> Auto_Set_Parameter_Values_For_ppk2fac.txt
 REM  Is this a formatted or unformatted file? [f/u]:
 echo f    >> Auto_Set_Parameter_Values_For_ppk2fac.txt
 REM  Enter name for output standard deviation array file:
-echo t.OUTPUT_sd.ref.txt    >> Auto_Set_Parameter_Values_For_ppk2fac.txt
+echo sd.ref.txt    >> Auto_Set_Parameter_Values_For_ppk2fac.txt
 REM  Is this a formatted or unformatted file? [f/u]:
 echo f    >> Auto_Set_Parameter_Values_For_ppk2fac.txt
 REM  Enter name for regularisation information file:
-echo t.OUTPUT_reg.txt   >> Auto_Set_Parameter_Values_For_ppk2fac.txt
+echo reg.ref.txt   >> Auto_Set_Parameter_Values_For_ppk2fac.txt
 
 ppk2fac.exe  < Auto_Set_Parameter_Values_For_ppk2fac.txt  >>  s.report.txt
 
