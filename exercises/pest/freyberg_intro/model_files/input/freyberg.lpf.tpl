@@ -6,7 +6,7 @@ ptf ~
          1
          0
          0
-CONSTANT    ~      HK1     ~                     #hk Layer 1
-CONSTANT    1.000000E+00                         #vka Layer 1
-CONSTANT        1e-4                           STORAGE Layer   1
-CONSTANT        0.25                           SPECIFIC YIELD Layer   1
+CONSTANT    ~      hk1     ~                  # hk Layer 1
+CONSTANT    1.000000E+00                      # vka Layer 1
+CONSTANT        1e-4                          # STORAGE Layer   1
+CONSTANT        0.25                          # SPECIFIC YIELD Layer   1
