@@ -1,0 +1,1 @@
+.\..\..\..\..\bin\mf_nwt_1.1.4.exe .\freyberg.nam
