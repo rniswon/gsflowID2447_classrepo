@@ -18,8 +18,7 @@
 # 
 
 # ### Background
-# At this stage, we have built the input files for the PRMS model using GSFLOW-arcpy. One of the files that are generated is the hru_param.shp file. This shapefile has most of the information we will need to build the MODFLOW model. 
-
+# At this stage, we have built the input files for the PRMS model using GSFLOW-arcpy. One of the files that are generated is the hru_param.shp file. This shapefile has most of the information we will need to build the MODFLOW model.
 # <img src=".\figures\WorkFlow.png">
 
 # 
@@ -27,36 +26,37 @@
 # ### MODFLOW PACKAGES
 #  <img src=".\figures\mf_packages.png">
 
-# In[12]:
+# In[50]:
 
 
 import os
+import pandas as pd
 import geopandas as gpd
-import matplotlib.pyplot as plt
 import flopy
 import numpy as np
-import pandas as pd
 import datetime
+import matplotlib.pyplot as plt
 
 
 # ### Explore HRU Shapefile Using Geopandas
 # Let us upload the hru_param.shp file and look at it.
 
-# In[13]:
+# In[51]:
+
 
 
 hru_shp_file = r"../models_data/gis/hru_params.shp"
 hru_shp = gpd.read_file(hru_shp_file)
 
 
-# In[14]:
+# In[52]:
 
 
 #Let us look at the attribute table and plot some information ....
 hru_shp.head(5) # list the first 5 rows
 
 
-# In[15]:
+# In[53]:
 
 
 # Two ways to access data in Geopandas
@@ -64,7 +64,7 @@ hru_shp.HRU_TYPE
 hru_shp['HRU_TYPE']
 
 
-# In[16]:
+# In[54]:
 
 
 # We can plot any field in the attribute table
@@ -72,14 +72,14 @@ hru_shp.plot(column='HRU_TYPE',  figsize=(12, 12))
 plt.title("Active Domain")
 
 
-# In[17]:
+# In[55]:
 
 
 ## access other values in hru shapefile
 print(hru_shp.columns)
 
 
-# In[18]:
+# In[56]:
 
 
 # sort attribute table data so that the HRU_ID sorted as 1,2,3,...
@@ -88,9 +88,9 @@ hru_shp.head(5)
 
 
 # ### FLOPY
-# 
+#  <img src=".\figures\flopy3.png">
 
-# In[19]:
+# In[57]:
 
 
 # Generate an empty flopy object. 
@@ -103,11 +103,11 @@ print(mf)
 
 
 # ### Model discretization - DIS package
-# * This package define the spatial and time domain of the problem,
+# * This package define the spatial domain and simulated period of the problem,
 # * Discretize the domain using the grid used for HRU
 #  <img src=".\figures\dis.png">
 
-# In[20]:
+# In[58]:
 
 
 # Define the grid -- Space descritization
@@ -118,7 +118,7 @@ del_c = 90.0
 print(n_col, n_row)
 
 
-# In[21]:
+# In[59]:
 
 
 # The domain groundwater model is a 3D, so we need to specify the 
@@ -130,7 +130,7 @@ thk2 =  np.loadtxt(r"../models_data/misc/thickness2.txt")           # thickness 
 plt.imshow(thk2); plt.colorbar()
 
 
-# In[22]:
+# In[60]:
 
 
 # Layers elevation
@@ -154,7 +154,7 @@ plt.imshow(btm2, cmap = 'jet'); plt.colorbar(fraction=0.046, pad=0.04);  plt.tit
 # ### Discretization of Simulation Period
 # <img src = ".\figures\StressPeriod.png">
 
-# In[23]:
+# In[61]:
 
 
 # Simulation period & time steps -- -- Temporal discretization
@@ -186,12 +186,18 @@ mf
 # #### MODFLOW online help 
 # https://water.usgs.gov/ogw/modflow/MODFLOW-2005-Guide/
 
-# In[24]:
+# In[62]:
 
 
 #dis.botm.array
 #dis.check()
 dis.plot()
+
+
+# In[63]:
+
+
+mf.get_package_list()
 
 
 # ### BAS Package
@@ -204,7 +210,7 @@ dis.plot()
 # 
 # <img src=".\figures\cell_types.png">
 
-# In[25]:
+# In[64]:
 
 
 ## Read HRU_TYPE from hru shape file and reshape it into 2D domain
@@ -213,7 +219,7 @@ ibound2d = hru_shp["HRU_TYPE"].values.reshape(n_row, n_col)
 plt.imshow(ibound2d)
 
 
-# In[26]:
+# In[65]:
 
 
 ## Constant Head
@@ -223,7 +229,7 @@ ibound2d[const_head_rows, const_head_cols] = -1
 plt.imshow(ibound2d)
 
 
-# In[27]:
+# In[66]:
 
 
 ## HRU shapefile has a 2D map of the inactive zones, so we need to define the active domain for the 3D groundwater domain.
@@ -235,7 +241,7 @@ for lay in range(nlayrs):
 ibound3d.shape
 
 
-# In[28]:
+# In[67]:
 
 
 ## initial head
@@ -252,13 +258,7 @@ bas = flopy.modflow.ModflowBas(mf, ibound=ibound3d, strt=initial_head)
 bas.plot()
 
 
-# In[ ]:
-
-
-
-
-
-# In[29]:
+# In[68]:
 
 
 # Check packages that are assigned so far...
@@ -267,18 +267,18 @@ mf.get_package_list()
 
 # ## Ploting the Grid ....
 
-# In[30]:
+# In[69]:
 
 
 fig = plt.figure(figsize=(8, 8))
 ax = fig.add_subplot(1, 1, 1, aspect='equal')
-modelmap = flopy.plot.ModelMap(model=mf, rotation=0.0)
+modelmap = flopy.plot.ModelMap(model=mf, rotation=0.0,  layer=0)
 quadmesh = modelmap.plot_ibound()
 linecollection = modelmap.plot_grid()
 
 
 
-# In[31]:
+# In[70]:
 
 
 # cross section
@@ -288,7 +288,7 @@ ax = fig.add_subplot(1, 2, 1)
 modelxsect = flopy.plot.ModelCrossSection(model=mf, line={'Column': col_num})
 patches = modelxsect.plot_ibound()
 linecollection = modelxsect.plot_grid()
-t = ax.set_title('Column{}'.format(col_num))
+t = ax.set_title('Column {}'.format(col_num))
 
 ax = fig.add_subplot(1, 2, 2)
 row_num = 50
@@ -309,19 +309,12 @@ t = ax.set_title('Row {}'.format(row_num))
 # *  Anistropy 
 # *  Layer type (Confined, unconfined, convertable)
 
-# In[ ]:
-
-
-
-
-
-
-# In[32]:
+# In[71]:
 
 
 laytyp = np.ones(nlayrs)  # convertable layer
 avg_typ = 0               # 0 is harmonic mean 1 is logarithmic mean 2 is arithmetic mean 
-h_anis = 1.0              # a flag or the horizontal anisotropy
+h_anis = 1.0              # a flag or the horizontal anisotropy, 1 means kx = ky
 layvka = 0                # 0—indicates VKA is vertical hydraulic conductivity
 laywet = np.zeros(nlayrs) #contains a flag for each layer that indicates if wetting is active. 
                           #laywet should always be zero for the UPW Package 
@@ -335,7 +328,7 @@ ss = np.zeros((nlayrs, n_row, n_col))
 ss[0,:,:] = np.loadtxt(r"../models_data/misc/ss1.txt")
 ss[1,:,:]=np.loadtxt(r"../models_data/misc/ss2.txt")
 
-# Specific Storage
+# Specific Yield
 sy = np.zeros((nlayrs, n_row, n_col))
 sy[0,:,:] = np.loadtxt(r"../models_data/misc/sy1.txt")
 sy[1,:,:]=np.loadtxt(r"../models_data/misc/sy1.txt")  
@@ -348,9 +341,10 @@ upw = flopy.modflow.mfupw.ModflowUpw(mf, laytyp=laytyp, layavg=avg_typ, chani=h_
 ## Can you Check UPW package? 
 
 
-# In[33]:
+# In[72]:
 
 
+# can you find locations where sy is too small (<0.01))
 plt.imshow(sy[1,:,:]<=0.01)
 
 
@@ -366,7 +360,7 @@ plt.imshow(sy[1,:,:]<=0.01)
 # 
 # 
 
-# In[34]:
+# In[73]:
 
 
 # The stream data can be extracted from the hru shapefile by masking out all cells that has ISEG value equel to 0.
@@ -387,7 +381,7 @@ plt.title("Simulated stream network")
 # * streamd hydraulic conductivity,
 # * properties of the unsaturated zone. 
 
-# In[35]:
+# In[74]:
 
 
 ## Reach Data
@@ -435,7 +429,7 @@ reach_data.head(10)
 # 
 # <img src = ".\figures\sfr3.png">
 
-# In[36]:
+# In[75]:
 
 
 seg_data_labels = ['nseg', 'icalc', 'outseg', 'iupseg', 'iprior',
@@ -450,7 +444,7 @@ unique_segments = unique_segments.sort_values(by='ISEG')
 unique_segments
 
 
-# In[37]:
+# In[76]:
 
 
 n_segments =  len(unique_segments)
@@ -470,7 +464,7 @@ segment_data['roughch'] = 0.04                              # Roughness Coeffcie
 segment_data
 
 
-# In[38]:
+# In[77]:
 
 
 ## Can you think of another way to compute the widths if you have no data? 
@@ -482,17 +476,9 @@ if False:
     widths = min_width + (max_width - min_width)* (streams_data['DEM_FLOWAC'].values - streams_data['DEM_FLOWAC'].min())/flow_acc_range
 
 
-# 
-
-# In[ ]:
-
-
-
-
-
 # ### SFR2 General Options
 
-# In[39]:
+# In[79]:
 
 
 ## This the options in the first line in the SFR package
@@ -526,7 +512,7 @@ segment_data = segment_data.sort_values(by=['nseg'])
 reach_data.head(5)
 
 
-# In[40]:
+# In[80]:
 
 
 reach_data = reach_data.to_records(index=False)
@@ -549,7 +535,7 @@ sfr = flopy.modflow.ModflowSfr2(mf, nstrm=n_reaches, nss=n_segments, const=const
 mf.get_package_list()
 
 
-# In[41]:
+# In[81]:
 
 
 sfr.plot()
@@ -558,7 +544,7 @@ sfr.plot()
 # ### Output Control Package
 # This is where we tell MODFLOW how to print results output. It is wise to print the results only at the time you are interseted in. 
 
-# In[42]:
+# In[82]:
 
 
 # Add OC package to the MODFLOW model
@@ -579,7 +565,7 @@ for time_point in steps_to_print:
 spd
 
 
-# In[43]:
+# In[83]:
 
 
 oc = flopy.modflow.ModflowOc(mf, stress_period_data=spd, cboufm='(20i5)')
@@ -595,11 +581,11 @@ mf.get_package_list()
 # ### Unsaturated Zone Flow (UZF) Package
 # The Unsarurated Zone (USZ) plays a major role in underatanding the interaction between deep groundwater system ans surface water system. 
 
-# In[44]:
+# In[84]:
 
 
 nuztop =  3         # Recharge to and discharge from the top model layer
-iuzfopt = 1         # Vertical conductivity will specifed from upw
+iuzfopt = 1         # Vertical conductivity will specifed from in uzf
 irunflg = 2         # >0 means water discharge will be routed to the streams.
 ietflg = 0          # > 0 ET will be simulated
 ipakcb = 70         # > 0 recharge, ET, and discharge will be written unformatted file
@@ -616,7 +602,7 @@ plt.figure(figsize=(10,10))
 plt.imshow(irunbnd)
 
 
-# In[45]:
+# In[85]:
 
 
 finf = np.loadtxt(r"../models_data/misc/uzf_finf.txt")
@@ -635,14 +621,14 @@ annual_rain = 0.20 *  (annual_rain/ 365.25)/1000.0   # convert units from mm/yea
 
 
 
-# In[46]:
+# In[86]:
 
 
 #uzf.plot()
 plt.imshow(annual_rain.reshape(n_row, n_col)); plt.colorbar()
 
 
-# In[47]:
+# In[87]:
 
 
 thts = np.loadtxt(r"../models_data/misc//uzf_ths.txt") # porosity of the unsaturated zone
@@ -656,13 +642,7 @@ uzf = flopy.modflow.ModflowUzf1(mf, nuztop=nuztop, iuzfopt=iuzfopt, irunflg=irun
                                 finf=finf)
 
 
-# In[48]:
-
-
-#uzf.write_file()
-
-
-# In[49]:
+# In[88]:
 
 
 mf.get_package_list()
@@ -670,7 +650,7 @@ mf.get_package_list()
 
 # ### NWT Solver
 
-# In[50]:
+# In[89]:
 
 
 flopy.modflow.mfnwt.ModflowNwt.load(r"../models_data/misc/solver_options.nwt", mf)
@@ -684,19 +664,19 @@ if False:
                                            extension='nwt', unitnumber=None, filenames=None)
 
 
-# In[51]:
+# In[90]:
 
 
 mf.get_package_list()
 
 
-# In[52]:
+# In[91]:
 
 
 mf.write_input()
 
 
-# In[53]:
+# In[92]:
 
 
 mf.run_model()
@@ -705,20 +685,8 @@ mf.run_model()
 # ### Learn more About Flopy !!
 # https://github.com/modflowpy/flopy/tree/develop/examples/Notebooks
 
-# In[54]:
+# In[ ]:
 
 
 get_ipython().system(u'jupyter nbconvert --to script Groundwater_modeling_intro.ipynb')
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
