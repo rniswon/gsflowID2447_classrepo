@@ -1,0 +1,142 @@
+pcf
+* control data
+   restart  estimation
+  72   45   2   0    2
+   2    2  single  point  1  0  0  
+  20   -3.0   0.3  0.03   10
+10.0   10.0   0.001   0   0
+ 0.1  
+  10 0.01    3   3    0.01   3   
+   1    1    1 
+* parameter groups
+hk      relative    1.0000000000E-02  0  switch    2.0    parabolic   1.0E-05      5.0E-01  smaller              
+rch     relative    1.0000000000E-02  0  switch    2.0    parabolic   1.0E-05      5.0E-01  smaller
+* parameter data
+rch1     log     factor     1.382208E-04   7.900E-05    1.550E-04    rch   1.00E+00      0.00E+00   1          
+rch2     fixed   factor     9.358508E-05   7.900E-05    1.550E-04    rch   1.00E+00      0.00E+00   1          
+hkpp1    log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp2    log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp3    log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp4    log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp5    log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp6    log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp7    log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp8    log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp9    log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp10   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp11   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp12   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp13   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp14   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp15   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp16   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp17   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp18   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp19   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp20   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp21   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp22   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp23   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp24   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp25   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp26   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp27   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp28   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp29   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp30   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp31   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp32   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp33   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp34   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp35   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp36   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp37   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp38   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp39   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp40   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp41   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp42   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp43   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp44   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp45   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp46   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp47   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp48   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp49   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp50   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp51   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp52   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp53   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp54   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp55   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp56   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp57   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp58   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp59   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp60   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp61   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp62   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp63   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp64   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp65   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp66   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp67   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp68   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp69   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+hkpp70   log     factor     8.0            0.50         80.0          hk   1.00          0.00       1
+* observation groups
+flux_cal
+head_cal
+* observation data
+obswel1_1          22.21   1.0    head_cal
+obswel2_1          19.69   1.0    head_cal
+obswel3_1          22.70   1.0    head_cal
+obswel4_1          28.72   1.0    head_cal
+obswel5_1          18.25   1.0    head_cal
+obswel6_1          17.26   1.0    head_cal
+obswel7_1          18.01   1.0    head_cal
+obswel8_1          15.64   1.0    head_cal
+obswel9_1          23.31   1.0    head_cal
+obswel10_1         21.73   1.0    head_cal
+obswel11_1         14.64   1.0    head_cal
+obswel12_1         18.92   1.0    head_cal
+obswel13_1         14.42   1.0    head_cal
+obswel14_1         14.85   1.0    head_cal
+obswel1_2          22.01   1.0    head_cal
+obswel2_2          19.54   1.0    head_cal
+obswel3_2          22.45   1.0    head_cal
+obswel4_2          28.43   1.0    head_cal
+obswel5_2          18.03   1.0    head_cal
+obswel6_2          17.07   1.0    head_cal
+obswel7_2          17.78   1.0    head_cal
+obswel8_2          15.50   1.0    head_cal
+obswel9_2          23.01   1.0    head_cal
+obswel10_2         21.45   1.0    head_cal
+obswel11_2         14.44   1.0    head_cal
+obswel12_2         19.02   1.0    head_cal
+obswel13_2         14.93   1.0    head_cal
+obswel14_2         14.64   1.0    head_cal
+obswel1_3          21.14   1.0    head_cal
+obswel2_3          19.43   1.0    head_cal
+obswel3_3          21.43   1.0    head_cal
+obswel4_3          25.96   1.0    head_cal
+obswel5_3          17.54   1.0    head_cal
+obswel6_3          16.86   1.0    head_cal
+obswel7_3          16.89   1.0    head_cal
+obswel8_3          15.28   1.0    head_cal
+obswel9_3          21.05   1.0    head_cal
+obswel10_3         19.79   1.0    head_cal
+obswel11_3         14.10   1.0    head_cal
+obswel12_3         18.45   1.0    head_cal
+obswel13_3         15.13   1.0    head_cal
+obswel14_3         14.03   1.0    head_cal
+flow_time1      27426.68   1.0    flux_cal
+flow_time2      26615.37   1.0    flux_cal
+flow_time3      25612.37   1.0    flux_cal          
+* model command line
+_RunModel.bat
+* model input/output
+.\input\freyberg.rch.tpl                       .\input\freyberg.rch
+.\input\lpf_support\Lay_1_K_PP_List.txt.tpl    .\input\lpf_support\Lay_1_K_PP_List.txt
+.\output\freyberg.hobs.ins                     .\output\freyberg.hobs
+.\output\freyberg.sfrout.ins                   .\output\freyberg.sfrout
