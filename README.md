@@ -93,11 +93,7 @@ The following tentative agenda is based on a start time each morning of 8:30 AM 
 |8:30 AM   |MODSIM-GSFLOW (Continued)        |Morway                      |
 |10:30 AM  |BREAK                            |15 minutes                  |
 |10:45 AM  |Work in groups on GSFLOW models  |                            |
-|12:00 PM  |LUNCH                            |                            |
-|2:15 PM   |Work in groups on GSFLOW models  |                            |
-|3:15 PM   |BREAK				                  |                            |
-|3:30 PM   |Work in groups on GSFLOW models  |                            |
-|4:30 PM   |ADJOURN                          |                            |
+|12:00 PM  |ADJOURN                            |                          |
 
 
 ## Software
