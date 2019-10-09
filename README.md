@@ -47,7 +47,7 @@ The following tentative agenda is based on a start time each morning of 8:30 AM 
 |4:30 PM   |Adjourn                          |                            |
 
 
-### Tuesday ()
+### Tuesday (Introduction to PRMS and MODFLOW)
 
 |Time      |Topic                            |Lead, Duration              |
 |----------|---------------------------------|----------------------------|
@@ -60,7 +60,7 @@ The following tentative agenda is based on a start time each morning of 8:30 AM 
 |3:15 PM   |PRMS Model construction (Continued)|Niswonger                 |
 |4:30 PM   |Adjourn                           |                           |
 
-### Wednesday ()
+### Wednesday (PRMS and MODFLOW model construction)
 
 |Time      |Topic                            |Lead, Duration              |
 |----------|---------------------------------|----------------------------|
@@ -70,10 +70,10 @@ The following tentative agenda is based on a start time each morning of 8:30 AM 
 |12:00 PM  |LUNCH                            |                            |
 |1:15 PM   |MODFLOW Model construction       |Alzraiee                    |
 |2:45 PM   |BREAK                            |15 minutes                  |
-|4:00 PM   |MODFLOW Model calibration        |Morway                 |
+|4:00 PM   |MODFLOW Model calibration        |Morway                      |
 |4:30 PM   |ADJOURN                          |                            |
 
-### Thursday ()
+### Thursday (MODFLOW and PRMS calibration)
 
 |Time      |Topic                            |Lead, Duration              |
 |----------|---------------------------------|----------------------------|
@@ -86,7 +86,7 @@ The following tentative agenda is based on a start time each morning of 8:30 AM 
 |3:30 PM   |MODSIM-GSFLOW                    |Morway                      |
 |4:30 PM   |ADJOURN                          |                            |
 
-### Friday ()
+### Friday (MODSIM-GSFLOW)
 
 |Time      |Topic                            |Lead, Duration              |
 |----------|---------------------------------|----------------------------|
