@@ -6,9 +6,6 @@ December 3-6, 2018
 USGS New Mexico Water Science Center
 
 
-## Mifi Hotspots
-
-
 ## Location
 BLM-CA Multi-Use Conference Room, 2800 Cottage Way, Sacramento, CA
 
