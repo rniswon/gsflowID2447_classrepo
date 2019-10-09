@@ -41,7 +41,7 @@ The following tentative agenda is based on a start time each morning of 8:30 AM 
 |11:30 PM  |Introduction to MODFLOW          |Niswonger                   |
 |12:00 PM  |Lunch                            |1 hour 15 minutes           |
 |1:15 PM   |Introduction to MODFLOW (Continued)|Niswonger                 |
-|2:45 PM   |Introduction to MODFLOW (Continued)|Regan/Niswonger           |
+|2:45 PM   |Introduction to MODFLOW (Continued)|Niswonger                 |
 |3:30 AM   |Break                            |15 minutes                  |
 |3:45 PM   |Introduction to MODFLOW (Continued)|Niswonger                 |
 |4:30 PM   |Adjourn                          |                            |
