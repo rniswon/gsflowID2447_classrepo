@@ -79,7 +79,7 @@ The following tentative agenda is based on a start time each morning of 8:30 AM 
 |----------|---------------------------------|----------------------------|
 |8:30 AM   |MODFLOW Model calibration (Continued)| Morway                 |
 |10:30 AM  |BREAK                            |15 minutes                  |
-|10:45 AM  |MODFLOW model calibration (Continued)|Morway/Alzraiee         |
+|10:45 AM  |MODFLOW model calibration (Continued)|Alzraiee                |
 |12:00 PM  |LUNCH                            |                            |
 |2:15 PM   |PRMS model calibration           |Niwonger/Regan              |
 |3:15 PM   |BREAK				                  |                            |
