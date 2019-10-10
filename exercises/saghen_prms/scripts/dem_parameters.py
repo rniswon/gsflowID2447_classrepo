@@ -69,7 +69,7 @@ def dem_parameters(config_path):
     dem_units = inputs_cfg.get('INPUTS', 'dem_units').lower()
     dem_unit_types = {
         'meters': 'meter', 'm': 'meter', 'meter': 'meter',
-        'feet': 'feet', 'ft': 'meter', 'foot': 'meter',}
+        'feet': 'feet', 'ft': 'feet', 'foot': 'feet',}
     try:
         dem_units = dem_unit_types[dem_units]
     except:
